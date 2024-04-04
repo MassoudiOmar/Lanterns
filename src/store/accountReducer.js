@@ -4,6 +4,9 @@ import { ACCOUNT_INITIALIZE, LOGIN, LOGOUT } from './actions';
 export const initialState = {
     token: '',
     isLoggedIn: false,
+    role: '',
+    perm: '',
+    fullname: '',
     isInitialized: false
 };
 
@@ -12,10 +15,13 @@ export const initialState = {
 const accountReducer = (state = initialState, action) => {
     switch (action.type) {
         case ACCOUNT_INITIALIZE: {
-            const { isLoggedIn, token } = action.payload;
+            const { isLoggedIn, token, role,perm, fullname } = action.payload;
             return {
                 ...state,
                 isLoggedIn,
+                role,
+                perm,
+                fullname,
                 isInitialized: true,
                 token
             };
@@ -30,7 +36,10 @@ const accountReducer = (state = initialState, action) => {
             return {
                 ...state,
                 isLoggedIn: false,
-                token: ''
+                token: '',
+                role: '',
+                perm:[],
+                fullname: ''
             };
         }
         default: {

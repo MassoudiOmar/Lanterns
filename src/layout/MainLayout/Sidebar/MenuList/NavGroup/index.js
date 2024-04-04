@@ -37,9 +37,7 @@ const NavGroup = ({ item }) => {
                 return <NavItem key={menu.id} item={menu} level={1} />;
             default:
                 return (
-                    <Typography key={menu.id} variant="h6" color="error" align="center">
-                        Menu Items Error
-                    </Typography>
+                   null
                 );
         }
     });

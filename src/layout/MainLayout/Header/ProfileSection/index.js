@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import configData from '../../../../config';
+// import configData from '../../../../config';
 
 // material-ui
 import { makeStyles, useTheme } from '@material-ui/styles';
@@ -26,7 +26,6 @@ import ListItemButton from '@material-ui/core/ListItemButton';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import { useJwt } from "react-jwt";
 
 // project imports
 import MainCard from '../../../../ui-component/cards/MainCard';
@@ -124,8 +123,9 @@ const ProfileSection = () => {
     const dispatcher = useDispatch();
     const storedVariable = localStorage.getItem('Lantern-account');
     let data = JSON.parse(storedVariable)
-    let token = data.token.split(' ')[1]
-    const { decodedToken, isExpired } = useJwt(token);
+  
+
+    
     const [sdm, setSdm] = React.useState(true);
     const [value, setValue] = React.useState('');
     const [notification, setNotification] = React.useState(false);
@@ -134,7 +134,6 @@ const ProfileSection = () => {
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
     const handleLogout = () => {
-        console.log(account.token);
         dispatcher({ type: LOGOUT });
     };
     const handleToggle = () => {
@@ -205,16 +204,18 @@ const ProfileSection = () => {
                                     <CardContent className={classes.cardContent}>
                                         <Grid container direction="column" spacing={0}>
                                             <Grid item className={classes.flex}>
-                                                <Typography variant="h4">Good Morning,</Typography>
+                                                <Typography variant="h4"> Bonjour,</Typography>
                                                 <Typography component="span" variant="h4" className={classes.name}>
-                                                    {decodedToken?.fullname}
+                                              {JSON.parse(data.fullname)}
                                                 </Typography>
                                             </Grid>
                                             <Grid item>
-                                                <Typography variant="subtitle2">Admin</Typography>
+                                                <Typography variant="subtitle2">
+                                                    {data.role == 1 ? 'Admin' : 'Instructor'}
+                                                </Typography>
                                             </Grid>
                                         </Grid>
-                                        <OutlinedInput
+                                        {/* <OutlinedInput
                                             className={classes.searchControl}
                                             id="input-search-profile"
                                             value={value}
@@ -229,13 +230,14 @@ const ProfileSection = () => {
                                             inputProps={{
                                                 'aria-label': 'weight'
                                             }}
-                                        />
+                                        /> */}
                                         <Divider />
                                         <PerfectScrollbar className={classes.ScrollHeight}>
                                             <Divider />
                                             <Card className={classes.card}>
                                                 <CardContent>
                                                     <Grid container spacing={3} direction="column">
+                                                        {/* 
                                                         <Grid item>
                                                             <Grid item container alignItems="center" justifyContent="space-between">
                                                                 <Grid item>
@@ -250,12 +252,13 @@ const ProfileSection = () => {
                                                                         size="small"
                                                                     />
                                                                 </Grid>
-                                                            </Grid>
+                                                            </Grid> 
                                                         </Grid>
+                                                            */}
                                                         <Grid item>
                                                             <Grid item container alignItems="center" justifyContent="space-between">
                                                                 <Grid item>
-                                                                    <Typography variant="subtitle1">Allow Notifications</Typography>
+                                                                    <Typography variant="subtitle1">Autoriser les notifications</Typography>
                                                                 </Grid>
                                                                 <Grid item>
                                                                     <Switch
@@ -281,7 +284,7 @@ const ProfileSection = () => {
                                                     <ListItemIcon>
                                                         <IconLogout stroke={1.5} size="1.3rem" />
                                                     </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
+                                                    <ListItemText primary={<Typography variant="body2">Se déconnecter</Typography>} />
                                                 </ListItemButton>
                                             </List>
                                         </PerfectScrollbar>

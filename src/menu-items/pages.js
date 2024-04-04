@@ -14,31 +14,50 @@ const icons = {
 
 export const pages = {
     id: 'pages',
-    title: 'Pages',
-    caption: 'Pages Caption',
+    title: 'Autre',
     type: 'group',
     children: [
         {
-            id: 'authentication',
-            title: 'Authentication',
+            id: 'Etablissement',
             type: 'collapse',
-            icon: icons['IconKey'],
-            children: [
-                {
-                    id: 'login3',
-                    title: 'Login',
-                    type: 'item',
-                    url: '/pages/login/login3',
-                    target: true
-                },
-                {
-                    id: 'register3',
-                    title: 'Register',
-                    type: 'item',
-                    url: '/pages/register/register3',
-                    target: true
-                }
-            ]
-        }
+            icon: icons['IconCategory'],
+            title: 'Etablissement',
+            type: 'item',
+            url: '/etablissements',
+            breadcrumbs: false
+
+        },
+        {
+            id: 'Lettre',
+            type: 'collapse',
+            icon: icons['IconCategory'],
+            title: 'Newsletter',
+            type: 'item',
+            url: '/lettre',
+            breadcrumbs: false
+
+        },
+        {
+            id: 'scholarships',
+            type: 'collapse',
+            icon: icons['IconCategory'],
+            title: 'Scholarships',
+            type: 'item',
+            url: '/scholarships',
+            breadcrumbs: false
+
+        },
+        {
+            id: 'Callbacks',
+            type: 'collapse',
+            icon: icons['IconCategory'],
+            title: 'Callbacks',
+            type: 'item',
+            url: '/callbacks',
+            breadcrumbs: false
+
+        },
+       
+
     ]
 };

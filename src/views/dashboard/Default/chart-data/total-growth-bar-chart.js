@@ -34,7 +34,21 @@ const chartData = {
         },
         xaxis: {
             type: 'category',
-            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            categories : [
+                "Jan",
+                "Fév",
+                "Mar",
+                "Avr",
+                "Mai",
+                "Jui",
+                "Juill",
+                "Août",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Déc"
+            ]
+            
         },
         legend: {
             show: true,

@@ -33,6 +33,9 @@ export function theme(customization) {
     return createTheme({
         direction: 'ltr',
         palette: themePalette(themeOption),
+        background: {
+            default: '#fff', // default background color
+          },
         mixins: {
             toolbar: {
                 minHeight: '48px',

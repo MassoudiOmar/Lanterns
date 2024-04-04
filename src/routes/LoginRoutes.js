@@ -9,7 +9,6 @@ import Loadable from '../ui-component/Loadable';
 
 // login routing
 const AuthLogin = Loadable(lazy(() => import('../views/pages/authentication/login')));
-const AuthRegister = Loadable(lazy(() => import('../views/pages/authentication/register')));
 
 //-----------------------|| AUTH ROUTING ||-----------------------//
 
@@ -18,16 +17,16 @@ const LoginRoutes = () => {
 
     return (
         <Route path={['/login', '/register']}>
-            <MinimalLayout>
+            {/* <MinimalLayout> */}
                 <Switch location={location} key={location.pathname}>
                     <NavMotion>
                         <GuestGuard>
                             <Route path="/login" component={AuthLogin} />
-                            <Route path="/register" component={AuthRegister} />
+                          
                         </GuestGuard>
                     </NavMotion>
                 </Switch>
-            </MinimalLayout>
+            {/* </MinimalLayout> */}
         </Route>
     );
 };

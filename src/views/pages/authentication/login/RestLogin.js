@@ -25,11 +25,12 @@ import {
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode'
 
 // project imports
 import useScriptRef from '../../../../hooks/useScriptRef';
 import AnimateButton from '../../../../ui-component/extended/AnimateButton';
-import { ACCOUNT_INITIALIZE } from './../../../../store/actions';
+import { ACCOUNT_INITIALIZE, SET_VARIABLE } from './../../../../store/actions';
 
 // assets
 import Visibility from '@material-ui/icons/Visibility';
@@ -113,10 +114,38 @@ const RestLogin = (props, { ...others }) => {
                         })
                         .then(function (response) {
                             if (response.data.success) {
-                                dispatcher({
-                                    type: ACCOUNT_INITIALIZE,
-                                    payload: { isLoggedIn: true, token: response.data.token }
-                                });
+                                const user = jwtDecode(response.data.token);
+                                if (user.role_id == 1 || user.role_id == 2) {
+                                    axios.get(configData.API_SERVER + `roles/${user.role_id}`, {
+                                        headers: {
+                                            'Authorization': response.data.token
+                                        }
+                                    })
+                                        .then((res) => {
+                                            const { data: responseData } = response;
+                                            const { token } = responseData;
+
+                                            const { role_id: roleId, fullname } = user;
+
+                                            const permissions = res?.data?.permissions?.map(permission => permission?.perm_name);
+                                            dispatcher({ type: SET_VARIABLE, variable: permissions });
+                                            dispatcher({
+                                                type: ACCOUNT_INITIALIZE,
+                                                payload: {
+                                                    token,
+                                                    role: roleId,
+                                                    fullname,
+                                                    perm: permissions,
+                                                    isLoggedIn: true
+                                                }
+                                            });
+                                        })
+                                        .catch((err) => console.log(err))
+
+                                } else {
+                                    setErrors({ submit: 'Not Allowed!' });
+
+                                }
 
                                 if (scriptedRef.current) {
                                     setStatus({ success: true });
@@ -125,8 +154,9 @@ const RestLogin = (props, { ...others }) => {
                             } else { console.log("first") }
                         })
                         .catch(function (error) {
+                            console.log(error)
                             setStatus({ success: false });
-                            setErrors({ submit: error.response.data.message || error.response.data.msg });
+                            setErrors({ submit: error?.response?.data.message || error?.response?.data.msg });
                             setSubmitting(false);
                         });
                     // } catch (err) {
