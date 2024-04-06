@@ -6,6 +6,7 @@ import MainCard from '../../../ui-component/cards/MainCard';
 import configData from '../../../config';
 import { TableContainer, Table, TableHead, TableBody, TableRow, TableCell, IconButton, Paper, Typography } from '@material-ui/core';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@material-ui/icons';
+import TinyMce from '../../../ui-component/Tiny';
 
 const EditEstablishment = () => {
     const history = useHistory();
@@ -16,6 +17,10 @@ const EditEstablishment = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState({ color: '', msg: '' });
     const [user, setUser] = useState([])
+    const handleDescription = (e) => {
+        setUser({ ...user, description: e });
+    };
+
     useEffect(() => {
         getEstablishment();
     }, []);
@@ -41,7 +46,7 @@ const EditEstablishment = () => {
     const getEstablishment = async () => {
         try {
             const token = JSON.parse(getToken());
-            const res = await axios.get("${configData.API_SERVER}" + `establishments/${id}`, {
+            const res = await axios.get(`${configData.API_SERVER}establishments/${id}`, {
                 headers: {
                     'Authorization': token
                 }
@@ -134,20 +139,36 @@ const EditEstablishment = () => {
                         label="Nom"
                         variant="outlined"
                         fullWidth
-                        value={user.name}
+                        value={user.name || " "}
                         onChange={handleChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
-                        name="description"
-                        label="Description"
+                        name="image"
+                        label="Nom de la fichier"
                         variant="outlined"
                         fullWidth
-                        value={user.description}
-                        onChange={handleChange}
+                        value={user.image||" "}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment onClick={handleEditIconClick} position="end">
+                                    <Button variant="contained" color="primary" component="span">
+                                        Sélectionnez une fichier
+                                    </Button>
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={handleFileChange}
                     />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                     <TextField
                         name="email"
@@ -169,29 +190,7 @@ const EditEstablishment = () => {
                     />
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                    <TextField
-                        name="image"
-                        label="Nom de la fichier"
-                        variant="outlined"
-                        fullWidth
-                        value={user.image}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment onClick={handleEditIconClick} position="end">
-                                    <Button variant="contained" color="primary" component="span">
-                                        Sélectionnez une fichier
-                                    </Button>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        onChange={handleFileChange}
-                    />
+                    <TinyMce onData={handleDescription} data={user.description} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
@@ -243,7 +242,7 @@ const EditEstablishment = () => {
                         )}
                     </Box>
                 </Grid>
-                <MainCard title="Utilisateurs inclus" style={{ width: "100%" }} >
+                {/* <MainCard title="Utilisateurs inclus" style={{ width: "100%" }} >
                     {usersPermission.includes('lesson_add') &&
                         <Grid container justifyContent="flex-end" item xs={12} onClick={() => history.push(`/ajoute-chapitre`)}>
                             <Button variant="outlined" color="primary">
@@ -290,7 +289,7 @@ const EditEstablishment = () => {
                         </TableContainer> :
                         <span>il n'y a pas de utilisateurs</span>
                     }
-                </MainCard>
+                </MainCard> */}
 
                 <Grid item xs={12} sm={12}>
                     <Button variant="outlined" color="primary" onClick={handleSubmit}>

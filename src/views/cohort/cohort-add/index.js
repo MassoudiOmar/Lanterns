@@ -102,9 +102,7 @@ const AddCohort = () => {
         formData.append('path_image', user.file);
         formData.append('path_price', user.path_price);
         formData.append('category_id', user.category_id);
-        for (const entry of formData.entries()) {
-            console.log(entry);
-        }
+     
 
         let Lantern = localStorage.getItem('Lantern-account');
         let tokenObj = JSON.parse(Lantern);

@@ -77,7 +77,7 @@ const EditCohort = () => {
         let tokenObj = JSON.parse(Lantern)
         let token = tokenObj.token
 
-        axios.delete(configData.API_SERVER + `lessons/${userToDeleteId}`, {
+        axios.delete(configData.API_SERVER + `chapters/${userToDeleteId}`, {
             headers: {
                 'Authorization': JSON.parse(token)
             }
@@ -193,7 +193,7 @@ const EditCohort = () => {
             formData.append('path_price', data.path_price);
             formData.append('category_id', data.category_id);
 
-            console.log(data);
+         
 
             const response = await axios.put(configData.API_SERVER + `paths/${id}`, formData, {
                 headers: {
@@ -233,7 +233,7 @@ const EditCohort = () => {
                 <DialogTitle id="alert-dialog-title">{"Confirmation"}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Êtes-vous sûr de vouloir supprimer cet Leçon ?
+                        Êtes-vous sûr de vouloir supprimer cet chapitre ?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

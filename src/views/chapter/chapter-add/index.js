@@ -23,7 +23,7 @@ const AddChapter = () => {
         lesson_image: '',
         duration: '',
         deadline: 'dd/mm/yyy',
-        lesson_type: 'assignment',
+        lesson_type: '',
         chapter_id: id,
         file: null
     });
@@ -49,32 +49,24 @@ const AddChapter = () => {
     };
 
     const handleSubmit = () => {
-        let formErrors = {};
+        let requestBody = {
+            lesson_title: user.lesson_title,
+            lesson_description: user.lesson_description,
+            lesson_type: timeValue === 'Examen' ? 'assignment' : user.lesson_type,
+            duration: timeValue === 'Examen' ? "null" : user.duration,
+            lesson_image: timeValue === 'Examen' ? "null" : user.file,
+            deadline: user.deadline,
+            chapter_id: id
+        };
 
-
-
-        // let data = {};
-
-        // switch (timeValue) {
-        //     case "Leçon":
-        //         data = { lesson_description: user?.lesson_description, duration: user?.duration, lesson_type: user?.lesson_type, lesson_image: user?.lesson_image, lesson_title: user.lesson_title, path_id: id };
-        //         break;
-        //     case "Examen":
-        //         data = { deadline: user?.deadline, lesson_description: user?.lesson_description, duration: user?.duration, lesson_title: user.lesson_title, path_id: id };
-        //         break;
-        //     default:
-        //         data = null;
-        //         break;
-        // }
+        let requestBodyString = new URLSearchParams(requestBody).toString();
 
 
         let Lantern = localStorage.getItem('Lantern-account');
         let tokenObj = JSON.parse(Lantern);
         let token = tokenObj.token;
-        console.log(user);
-        let data = { ...user, lesson_type: "assignment", path_id: id }
 
-        axios.post(`${configData.API_SERVER}` + "lessons", user, {
+        axios.post(`${configData.API_SERVER}` + "lessons", requestBodyString, {
             headers: {
                 'Authorization': JSON.parse(token)
             }
@@ -83,14 +75,6 @@ const AddChapter = () => {
                 setSnackbarMessage({ color: "green", msg: "Lesson added" });
                 setSnackbarOpen(true);
                 setTimeout(() => { handleSnackbarClose() }, 1500);
-                setUser({
-                    lesson_title: '',
-                    lesson_description: '',
-                    lesson_image: '',
-
-                    lesson_type: '',
-                    file: null
-                });
                 setTimeout(() => { history.goBack() }, 2000);
             })
             .catch((err) => {
@@ -193,11 +177,11 @@ const AddChapter = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 select
-                                name="socialMedia"
+                                name="lesson_type"
                                 label="Type"
                                 variant="outlined"
                                 fullWidth
-                                value={user.socialMedia}
+                                value={user.lesson_type}
                                 onChange={(event) => {
                                     handleChange(event);
                                 }}

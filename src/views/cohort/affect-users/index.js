@@ -4,84 +4,83 @@ import { TextField, Button, Grid, MenuItem } from '@material-ui/core';
 import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import axios from 'axios'
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import configData from '../../../config';
 
 const AffectUsers = () => {
     const history = useHistory();
+    const { id } = useParams();
 
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [establishments, setEstablishments] = useState();
+    const [userss, setuserss] = useState();
+    console.log(userss, "userr");
 
     const [user, setUser] = useState({
         etablissement: '',
         users: '',
         instructors: ''
     });
-    console.log(user);
 
     const [errors, setErrors] = useState({
         etablissement: false,
         users: false,
         instructors: false
     });
+    useEffect(() => {
+        if (user.etablissement) {
+            try {
+
+                let Lantern = localStorage.getItem('Lantern-account')
+                let tokenObj = JSON.parse(Lantern)
+                let token = tokenObj.token
+
+                axios.get(configData.API_SERVER + 'establishments/' + user.etablissement, {
+                    headers: {
+                        'Authorization': JSON.parse(token)
+                    }
+                })
+                    .then((res) => {
+                        setuserss(res.data);
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    });
+            } catch (err) { console.log(err) }
+        }
+    }, [user])
 
     const handleChange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = () => {
-        let formErrors = {};
-        let hasErrors = false;
 
-        Object.keys(user).forEach((key) => {
-            if (!user[key]) {
-                formErrors[key] = true;
-                hasErrors = true;
-            } else {
-                formErrors[key] = false;
-            }
-        });
-       
-
-        if (hasErrors) {
-            setErrors(formErrors);
-            setSnackbarMessage({ color: "red", msg: "Veuillez remplir tous les champs." });
-            setSnackbarOpen(true);
-            return;
-        }
 
         let Lantern = localStorage.getItem('Lantern-account');
         let tokenObj = JSON.parse(Lantern);
         let token = tokenObj.token;
 
-        // axios.post(`${configData.API_SERVER}paths`, user, {
-        //     headers: {
-        //         'Authorization': JSON.parse(token)
-        //     }
-        // })
-        //     .then((res) => {
-        //         setSnackbarMessage({ color: "green", msg: "Path added" });
-        //         setSnackbarOpen(true);
-        //         setTimeout(() => { handleSnackbarClose() }, 1500);
-        //         setUser({
-        //             path_name: '',
-        //             path_description: '',
-        //             path_image: '',
-        //             path_price: '',
-        //             category_id: '',
-        //             file: null
-        //         });
-        //         setTimeout(() => { history.goBack() }, 2000);
-        //     })
-        //     .catch((err) => {
-        //         const errorMessage = err.response ? err.response.data.msg || err.response.data : "An error occurred";
-        //         setSnackbarMessage({ color: "red", msg: errorMessage });
-        //         setSnackbarOpen(true);
-        //         setTimeout(() => { handleSnackbarClose() }, 1500);
-        //     });
+        axios.post(`${configData.API_SERVER}establishments/${user.etablissement}/users`, user, {
+            headers: {
+                'Authorization': JSON.parse(token)
+            }
+        })
+            .then((res) => {
+                setSnackbarMessage({ color: "green", msg: res.data.message });
+                setSnackbarOpen(true);
+                setTimeout(() => { handleSnackbarClose() }, 1500);
+
+                setTimeout(() => { history.goBack() }, 2000);
+            })
+            .catch((err) => {
+                const errorMessage = err.response ? err.response.data.msg || err.response.data : "An error occurred";
+                setSnackbarMessage({ color: "red", msg: errorMessage });
+                setSnackbarOpen(true);
+                setTimeout(() => { handleSnackbarClose() }, 1500);
+            });
     };
 
 
@@ -193,10 +192,12 @@ const AffectUsers = () => {
                             multiple: true,
                         }}
                     >
-                        {[`etablissement ${user.etablissement}'s Instructor`, `etablissement ${user.etablissement}'s Instructor`, `etablissement ${user.etablissement}'s Instructor`, `etablissement ${user.etablissement}'s Instructor`, `etablissement ${user.etablissement}'s Instructor`,]?.map((role, i) => (
-                            <MenuItem key={role} value={i + 1}>
-                                {role}
-                            </MenuItem>))}
+                        {userss?.users?.filter(user => user.role_id === 2).map((user, i) => (
+                            <MenuItem key={user.id} value={i + 1}>
+                                {user.fullname}
+                            </MenuItem>
+                        ))}
+
                     </TextField>
                 </Grid> :
                     <Grid item xs={12} sm={12}>
@@ -214,10 +215,12 @@ const AffectUsers = () => {
                                 multiple: true,
                             }}
                         >
-                            {[`etablissement ${user.etablissement}'s student`, `etablissement ${user.etablissement}'s student`, `etablissement ${user.etablissement}'s student`, `etablissement ${user.etablissement}'s student`, `etablissement ${user.etablissement}'s student`,]?.map((role, i) => (
-                                <MenuItem key={role} value={i + 1}>
-                                    {role}
-                                </MenuItem>))}
+                            {userss?.users?.filter(user => user.role_id === 3).map((user, i) => (
+                                <MenuItem key={user.id} value={i + 1}>
+                                    {user.fullname}
+                                </MenuItem>
+                            ))}
+
                         </TextField>
                     </Grid>
                 }

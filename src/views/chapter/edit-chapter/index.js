@@ -7,6 +7,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useHistory, useParams } from 'react-router-dom';
 import axios from 'axios';
 import configData from '../../../config';
+import TinyMce from '../../../ui-component/Tiny';
 
 const EditChapter = () => {
     const { id } = useParams();
@@ -26,20 +27,9 @@ const EditChapter = () => {
         createdAt: '',
         updatedAt: ''
     });
-    /*
-     "id": 1,
-  "lesson_title": "test1",
-  "lesson_description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam facilisis lacus a urna tincidunt consequat. Duis eleifend ligula lectus, eget auctor magna consectetur nec. Maecenas posuere diam a dui varius dignissim. Nam efficitur vitae urna eget suscipit. ",
-  "lesson_image": null,
-  "lesson_video": null,
-  "lesson_files": null,
-  "lesson_text": null,
-  "lesson_type": null,
-  "lesson_status": "Lesson created, status Done",
-  "path_id": 45,
-  "creator_id": 1,
-  "creator_name": "Admin",
-    */
+    const handleDescription = (e) => {
+        setLesson({ ...lesson, lesson_description: e });
+    };
 
     useEffect(() => {
         getLesson();
@@ -153,19 +143,11 @@ const EditChapter = () => {
                         onChange={handleChange}
                     />
                 </Grid>
-                <Grid item xs={12}>
-                    <TextField
-                        name="lesson_description"
-                        label="Description"
-                        variant="outlined"
-                        fullWidth
-                        multiline
-                        rows={4}
-                        value={lesson.lesson_description}
-                        onChange={handleChange}
-                    />
+
+                <Grid item xs={12} sm={12}>
+                    <TinyMce onData={handleDescription} data={lesson.lesson_description} />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6} >
                     <TextField
                         name="createdAt"
                         label="Created At"

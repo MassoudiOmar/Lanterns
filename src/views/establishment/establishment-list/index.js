@@ -19,15 +19,15 @@ import configData from '../../../config';
 const Etablissement = () => {
     const history = useHistory();
 
-    const [users, setEstablishment] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [establishments, setEstablishment] = useState([]);
+    const [filteredestablishments, setFilteredestablishments] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [userToDeleteId, setUserToDeleteId] = useState(null);
     const [forbidden, setforbidden] = useState(false);
-    const [usersPermission, setEstablishmentPermission] = useState([]);
+    const [establishmentsPermission, setEstablishmentPermission] = useState([]);
     const handleDelete = (userId) => {
         setUserToDeleteId(userId);
         setDeleteDialogOpen(true);
@@ -80,7 +80,7 @@ const Etablissement = () => {
 
     useEffect(() => {
         applyFilters();
-    }, [users, searchTerm]);
+    }, [establishments, searchTerm]);
 
     const getEstablishment = () => {
         try {
@@ -109,10 +109,10 @@ const Etablissement = () => {
     }
 
     const applyFilters = () => {
-        const filtered = users.filter(user =>
+        const filtered = establishments.filter(user =>
             user?.name?.toLowerCase().includes(searchTerm.toLowerCase())
         );
-        setFilteredUsers(filtered);
+        setFilteredestablishments(filtered);
     };
 
     const handleSearchChange = (event) => {
@@ -182,7 +182,7 @@ const Etablissement = () => {
                 forbidden ? "Vous n'êtes pas autorisé à continuer" :
                     <>
 
-                        {usersPermission.includes('user_add') && <Grid container justifyContent="flex-end" item xs={12} onClick={() => history.push(`/ajouter-etablissement`)}>
+                        {establishmentsPermission.includes('user_add') && <Grid container justifyContent="flex-end" item xs={12} onClick={() => history.push(`/ajouter-etablissement`)}>
                             <Button variant="outlined" color="primary">
                                 Ajouter Un Etablissement
                             </Button>
@@ -197,7 +197,7 @@ const Etablissement = () => {
                             margin="normal"
                         />
 
-                        {users?.length ?
+                        {establishments?.length ?
                             <TableContainer component={Paper}>
                                 <Table>
                                     <TableHead>
@@ -207,32 +207,32 @@ const Etablissement = () => {
                                             <TableCell>Nom</TableCell>
                                             <TableCell>E-mail</TableCell>
                                             <TableCell>Description</TableCell>
-                                            {(usersPermission.includes('user_delete') || usersPermission.includes('user_update')) &&
+                                            {(establishmentsPermission.includes('user_delete') || establishmentsPermission.includes('user_update')) &&
                                                 <TableCell>Actions</TableCell>}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {filteredUsers.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, i) => (
+                                        {filteredestablishments.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, i) => (
                                             <TableRow key={row.id}>
                                                 <TableCell>{row.id}</TableCell>
                                                 <TableCell>
-                                                    <img src={row.logo ? row.logo : 'https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg'} style={{ resize: "contain", height: "50px", width: "50px", borderRadius: "10px" }} />
+                                                    <img src={'https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg'} style={{ resize: "contain", height: "50px", width: "50px", borderRadius: "10px" }} />
                                                 </TableCell>
-                                                <TableCell>{row?.name}</TableCell>
-                                                <TableCell>{row?.email}</TableCell>
-                                                <TableCell>{row?.description}</TableCell>
+                                                <TableCell>{row.name.length > 10 ? row.name.slice(0, 10) + '...' : row.name}</TableCell>
+                                                <TableCell>{row.email.length > 30 ? row.email.slice(0, 30) + '...' : row.email}</TableCell>
+                                                <TableCell>{row.description.length > 40 ? row.description.slice(0, 40) + '...' : row.description}</TableCell>
                                                 <TableCell>
 
                                                     <>
-                                                        {usersPermission.includes('user_update') &&
-                                                            <IconButton style={{ color: "#2073c4" }} aria-label="edit" onClick={() => history.push(`/affect-establissement/${row.id}`)}>
+                                                        {establishmentsPermission.includes('user_update') &&
+                                                            <IconButton style={{ color: "#000" }} aria-label="edit" onClick={() => history.push(`/affect-establissement/${row.id}`)}>
                                                                 <PersonAdd />
                                                             </IconButton>}
-                                                        {usersPermission.includes('user_update') &&
+                                                        {establishmentsPermission.includes('user_update') &&
                                                             <IconButton style={{ color: "#2073c4" }} aria-label="edit" onClick={() => history.push(`/edit-etablissement/${row.id}`)}>
                                                                 <EditIcon />
                                                             </IconButton>}
-                                                        {usersPermission.includes('user_delete') &&
+                                                        {establishmentsPermission.includes('user_delete') &&
                                                             <IconButton style={{ color: "#c42020" }} aria-label="delete" onClick={() => handleDelete(row.id)}>
                                                                 <DeleteIcon />
                                                             </IconButton>}
@@ -269,8 +269,8 @@ const Etablissement = () => {
 
                         <div>
                             <Button onClick={() => handleChangePage(null, page - 1)} disabled={page === 1}>Précédent</Button>
-                            <Button onClick={() => handleChangePage(null, page + 1)} disabled={page >= Math.ceil(filteredUsers.length / rowsPerPage)}>Suivant</Button>
-                            <span>Page {page} of {Math.ceil(filteredUsers.length / rowsPerPage)}</span>
+                            <Button onClick={() => handleChangePage(null, page + 1)} disabled={page >= Math.ceil(filteredestablishments.length / rowsPerPage)}>Suivant</Button>
+                            <span>Page {page} of {Math.ceil(filteredestablishments.length / rowsPerPage)}</span>
                             <select value={rowsPerPage} onChange={handleChangeRowsPerPage}>
                                 {[5, 10, 25].map((pageSize) => (
                                     <option key={pageSize} value={pageSize}>

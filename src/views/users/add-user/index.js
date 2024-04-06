@@ -164,7 +164,7 @@ const AddUser = () => {
         formData.append('cv', "null");
 
 
-     
+
         axios.post(`${configData.API_SERVER}` + "users", formData, {
             headers: {
                 'Authorization': JSON.parse(token)
@@ -200,9 +200,9 @@ const AddUser = () => {
         setSnackbarOpen(false);
     };
 
-    // useEffect(() => {
-    //     getEstablishment();
-    // }, []);
+    useEffect(() => {
+        getEstablishment();
+    }, []);
 
     const getEstablishment = () => {
         try {
@@ -345,12 +345,12 @@ const AddUser = () => {
                         variant="outlined"
                         label="Date de naissance"
                         fullWidth
-                        value={user.birthday}
+                        value={user.birthday || ''}
                         onChange={handleChange}
                         error={errors.birthday}
                     />
                 </Grid>
-                {/* {
+                {
                     user.role_id && user.role_id == 2 || user.role_id == 3 ?
                         <Grid item xs={12} sm={6}>
                             <TextField
@@ -373,7 +373,7 @@ const AddUser = () => {
                                     </MenuItem>))}
                             </TextField>
                         </Grid> : null
-                } */}
+                }
                 <Grid item xs={12} sm={6}>
                     <TextField
                         name="photo"
