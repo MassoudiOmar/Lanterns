@@ -134,7 +134,7 @@ const ChapterList = () => {
         let Lantern = localStorage.getItem('Lantern-account')
         let tokenObj = JSON.parse(Lantern)
         let token = tokenObj.token
-        axios.put(`http://localhost:3000/api/v1/users/${id}`, data, {
+        axios.put(`${configData.API_SERVER}users/${id}`, data, {
             headers: {
                 'Authorization': JSON.parse(token)
             }

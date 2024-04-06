@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MainCard from '../../../ui-component/cards/MainCard';
-import { TableContainer, Table, TableHead, TableBody, TableRow, TableCell, IconButton, Paper, TextField, Button, Box, MenuItem } from '@material-ui/core';
+import { TableContainer, Table, TableHead, TableBody, TableRow, TableCell, IconButton, Paper, InputAdornment, TextField, Button, Box, MenuItem } from '@material-ui/core';
 import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import EditIcon from '@material-ui/icons/Edit';
@@ -14,6 +14,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Grid } from '@material-ui/core';
 import configData from '../../../config';
+import TinyMce from '../../../ui-component/Tiny';
 
 const EditCohort = () => {
     const { id } = useParams();
@@ -35,6 +36,9 @@ const EditCohort = () => {
         path_image: '',
         file: null
     });
+    const handleDescription = (e) => {
+        setUser({ ...user, path_description: e });
+    };
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [userToDeleteId, setUserToDeleteId] = useState(null);
@@ -145,13 +149,14 @@ const EditCohort = () => {
             let tokenObj = JSON.parse(Lantern)
             let token = tokenObj.token
 
-            const response = await axios.get(configData.API_SERVER + `paths/${id}/lessons`, {
+            const response = await axios.get(configData.API_SERVER + `paths/${id}/chapters`, {
                 headers: {
                     'Authorization': JSON.parse(token)
                 }
             });
             setLessons(response.data);
         } catch (error) {
+            console.log(error.response);
             setSnackbarMessage({ color: "red", msg: "Failed to fetch lesson" });
             setSnackbarOpen(true);
         }
@@ -160,7 +165,7 @@ const EditCohort = () => {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setUser({ ...user, file: file });
+            setUser({ ...user, path_image: file });
         }
     };
 
@@ -178,8 +183,19 @@ const EditCohort = () => {
             const token = tokenObj.token;
             let { path_description, path_image, path_name, path_price, category_id } = user
             let data = { path_description, path_image, path_name, path_price, category_id }
+            // Create a new FormData object
+            const formData = new FormData();
 
-            const response = await axios.put(configData.API_SERVER + `paths/${id}`, data, {
+            // Append data to the FormData object
+            formData.append('path_description', data.path_description);
+            formData.append('path_image', data.path_image);
+            formData.append('path_name', data.path_name);
+            formData.append('path_price', data.path_price);
+            formData.append('category_id', data.category_id);
+
+            console.log(data);
+
+            const response = await axios.put(configData.API_SERVER + `paths/${id}`, formData, {
                 headers: {
                     'Authorization': JSON.parse(token)
                 }
@@ -200,6 +216,7 @@ const EditCohort = () => {
             setSnackbarOpen(true);
         }
     };
+
 
     const handleSnackbarClose = () => {
         setSnackbarOpen(false);
@@ -288,24 +305,30 @@ const EditCohort = () => {
                 <Grid item xs={12} sm={6}>
                     <TextField
                         name="path_image"
-                        label="Image"
+                        label="Nom du fichier"
                         variant="outlined"
                         fullWidth
-                        value={user.path_image}
-                        onChange={handleChange}
+                        value={user?.path_image?.name}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment onClick={handleEditIconClick} position="end">
+                                    <Button variant="contained" color="primary" component="span">
+                                        Sélectionnez un fichier
+                                    </Button>
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={handleFileChange}
                     />
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                    <TextField
-                        name="path_description"
-                        label="Description"
-                        variant="outlined"
-                        fullWidth
-                        multiline
-                        rows={4}
-                        value={user.path_description}
-                        onChange={handleChange}
-                    />
+                    <TinyMce onData={handleDescription} data={user.path_description} />
                 </Grid>
                 <Grid item xs={12}>
                     <Box display="flex" justifyContent="center" position="relative">
@@ -370,13 +393,22 @@ const EditCohort = () => {
                 </Grid>
 
             </Grid>
-            <MainCard title="Leçons Incluses ">
-                {usersPermission.includes('lesson_add') &&
-                    <Grid container justifyContent="flex-end" item xs={12} onClick={() => history.push(`/ajoute-leçon/${id}`)}>
-                        <Button variant="outlined" color="primary">
-                            Ajouter un leçons
+            <Grid item xs={12}>
+                <Box display="flex" justifyContent="space-between" marginBottom={"1rem"}>
+
+                    <Button variant="outlined" color="primary" onClick={handleSubmit}>
+                        Edite Path
+                    </Button>
+                    {usersPermission.includes('lesson_add') &&
+                        <Button variant="outlined" color="primary" onClick={() => history.push(`/ajoute-chapitre/${id}`)}>
+                            Ajouter un chapitre
                         </Button>
-                    </Grid>}
+                    }
+                </Box>
+            </Grid>
+
+            <MainCard title="Chapitres Incluses ">
+
                 {Lessons?.length ?
                     <TableContainer component={Paper}>
                         <Table>
@@ -384,8 +416,6 @@ const EditCohort = () => {
                                 <TableRow>
                                     <TableCell>ID</TableCell>
                                     <TableCell>Titre</TableCell>
-                                    <TableCell>Description</TableCell>
-                                    <TableCell>Status</TableCell>
                                     {(usersPermission.includes('lesson_delete') || usersPermission.includes('lesson_update')) &&
                                         <TableCell>Actions</TableCell>}
                                 </TableRow>
@@ -394,14 +424,13 @@ const EditCohort = () => {
                                 {Lessons?.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, i) => (
                                     <TableRow key={row.id}>
                                         <TableCell>{i + 1}</TableCell>
-                                        <TableCell>{row.lesson_title}</TableCell>
-                                        <TableCell>{row.lesson_description.length > 50 ? row.lesson_description.slice(0, 50) + '...' : row.lesson_description}</TableCell>
-                                        <TableCell>{row.lesson_status || "null"}</TableCell>
+                                        <TableCell>{row.name}</TableCell>
+
                                         <TableCell>
                                             {
                                                 <>
                                                     {usersPermission.includes('lesson_update') &&
-                                                        <IconButton style={{ color: "#2073c4" }} aria-label="edit" onClick={() => history.push(`/edit-leçon/${row.id}`)}>
+                                                        <IconButton style={{ color: "#2073c4" }} aria-label="edit" onClick={() => history.push(`/edite-chapitre/${row.id}`)}>
                                                             <EditIcon />
                                                         </IconButton>}
                                                     {usersPermission.includes('lesson_delete') &&
@@ -419,13 +448,7 @@ const EditCohort = () => {
                     <span>il n'y a pas de path</span>
                 }
             </MainCard>
-            <Grid item xs={12}>
-                <Box display="flex" justifyContent="center" margin={"1rem"}>
-                    <Button variant="outlined" color="primary" onClick={handleSubmit}>
-                        Update Path
-                    </Button>
-                </Box>
-            </Grid>
+
         </MainCard>
     );
 };

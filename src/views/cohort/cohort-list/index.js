@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TableContainer, Table, TableHead, TableBody, TableRow, TableCell, IconButton, Paper, TextField, Button, Typography } from '@material-ui/core';
-import { Edit as EditIcon, Delete as DeleteIcon } from '@material-ui/icons';
+import { Edit as EditIcon, Delete as DeleteIcon, PersonAdd } from '@material-ui/icons';
 import MainCard from '../../../ui-component/cards/MainCard';
 import axios from "axios"
 import Snackbar from '@material-ui/core/Snackbar';
@@ -195,11 +195,7 @@ const CohortList = () => {
                 </DialogActions>
             </Dialog>
             <div style={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
-            <Grid style={{ marginRight: "8px" }} item onClick={() => history.push(`/affect-utilisateurs`)}>
-                    <Button variant="outlined" color="primary">
-                        Affecter Utilisateurs
-                    </Button>
-                </Grid>
+
                 {usersPermission.includes('path_add') &&
                     <Grid item onClick={() => history.push(`/ajoute-cohorte`)} >
                         <Button variant="outlined" color="primary">
@@ -207,7 +203,7 @@ const CohortList = () => {
                         </Button>
                     </Grid>}
 
-              
+
             </div>
 
             <TextField
@@ -238,12 +234,16 @@ const CohortList = () => {
                                 <TableRow key={row.id}>
                                     <TableCell>{row.id}</TableCell>
                                     <TableCell>{row?.path_name}</TableCell>
-                                    <TableCell>{row?.path_description}</TableCell>
+                                    <TableCell>{row.path_description.length > 50 ? row.path_description.slice(0, 50) + '...' : row.lesson_description}</TableCell>
                                     <TableCell>{row?.path_price}</TableCell>
                                     <TableCell>{row?.path_status}</TableCell>
                                     <TableCell>
                                         {
                                             <>
+                                                {usersPermission.includes('path_update') &&
+                                                    <IconButton style={{ color: "#000" }} aria-label="edit" onClick={() => history.push(`/affect-utilisateurs/${row.id}`)}>
+                                                        <PersonAdd />
+                                                    </IconButton>}
                                                 {usersPermission.includes('path_update') &&
                                                     <IconButton style={{ color: "#2073c4" }} aria-label="edit" onClick={() => history.push(`/edit-cohorte/${row.id}`)}>
                                                         <EditIcon />

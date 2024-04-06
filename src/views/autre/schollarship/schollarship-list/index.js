@@ -14,6 +14,7 @@ import { Grid } from '@material-ui/core';
 import Skeleton from '@material-ui/core/Skeleton';
 import { gridSpacing } from '../../../../store/constant';
 import { useHistory } from 'react-router-dom';
+import configData from '../../../../config';
 
 const SchoollarShip = () => {
     const history = useHistory();
@@ -70,7 +71,7 @@ const SchoollarShip = () => {
         let tokenObj = JSON.parse(Lantern)
         let token = tokenObj.token
 
-        axios.delete(`http://localhost:3000/api/v1/categories/${userToDeleteId}`, {
+        axios.delete(`${configData.API_SERVER}categories/${userToDeleteId}`, {
             headers: {
                 'Authorization': JSON.parse(token)
             }
@@ -106,7 +107,7 @@ const SchoollarShip = () => {
             let tokenObj = JSON.parse(Lantern)
             let token = tokenObj.token
 
-            axios.get('http://localhost:3000/api/v1/users', {
+            axios.get(`${configData.API_SERVER}`+'users', {
                 headers: {
                     'Authorization': JSON.parse(token)
                 }
@@ -152,7 +153,7 @@ const SchoollarShip = () => {
         let Lantern = localStorage.getItem('Lantern-account')
         let tokenObj = JSON.parse(Lantern)
         let token = tokenObj.token
-        axios.put(`http://localhost:3000/api/v1/users/${id}`, data, {
+        axios.put(`${configData.API_SERVER}users/${id}`, data, {
             headers: {
                 'Authorization': JSON.parse(token)
             }

@@ -91,7 +91,7 @@ const ADDEtablissement = () => {
         let Lantern = localStorage.getItem('Lantern-account')
         let tokenObj = JSON.parse(Lantern)
         let token = tokenObj.token
-        axios.post(`http://localhost:3000/api/v1/establishments`, formData, {
+        axios.post(`${configData.API_SERVER}` + "establishments", formData, {
             headers: {
                 'Authorization': JSON.parse(token),
 

@@ -1,4 +1,4 @@
-import React, { useState, useRef,useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import MainCard from '../../../ui-component/cards/MainCard';
 import { TextField, Button, Grid, MenuItem } from '@material-ui/core';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -7,6 +7,7 @@ import axios from 'axios'
 import { useHistory } from 'react-router-dom';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import configData from '../../../config';
+import TinyMce from '../../../ui-component/Tiny';
 
 const AddCohort = () => {
     const history = useHistory();
@@ -43,6 +44,10 @@ const AddCohort = () => {
         category_id: '',
         file: ''
     });
+    const handleDescription = (e) => {
+        setUser({ ...user, path_description: e });
+    };
+
 
     const [errors, setErrors] = useState({
         path_name: false,
@@ -63,7 +68,7 @@ const AddCohort = () => {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file && file.type.startsWith('image/')) {
-            setUser({ ...user, path_image: file.name, file: file });
+            setUser({ ...user, path_image: file, file: file });
         } else {
             setSnackbarMessage({ color: "red", msg: "Veuillez sélectionner un fichier image." });
             setSnackbarOpen(true);
@@ -90,12 +95,22 @@ const AddCohort = () => {
             setSnackbarOpen(true);
             return;
         }
+        // Append data one by one
+        let formData = new FormData();
+        formData.append('path_name', user.path_name);
+        formData.append('path_description', user.path_description);
+        formData.append('path_image', user.file);
+        formData.append('path_price', user.path_price);
+        formData.append('category_id', user.category_id);
+        for (const entry of formData.entries()) {
+            console.log(entry);
+        }
 
         let Lantern = localStorage.getItem('Lantern-account');
         let tokenObj = JSON.parse(Lantern);
         let token = tokenObj.token;
-
-        axios.post(`http://localhost:3000/api/v1/paths`, user, {
+        console.log(user);
+        axios.post(`${configData.API_SERVER}` + "paths", formData, {
             headers: {
                 'Authorization': JSON.parse(token)
             }
@@ -162,7 +177,7 @@ const AddCohort = () => {
                         label="Nom du fichier"
                         variant="outlined"
                         fullWidth
-                        value={user.path_image}
+                        value={user.path_image.name}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment onClick={handleEditIconClick} position="end">
@@ -207,7 +222,7 @@ const AddCohort = () => {
                         onChange={handleChange}
                         error={errors.category_id}
                     >
-                          {Categories?.map((role, i) => (
+                        {Categories?.map((role, i) => (
                             <MenuItem key={role} value={i + 1}>
                                 {role.name}
                             </MenuItem>
@@ -215,21 +230,11 @@ const AddCohort = () => {
                     </TextField>
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        name="path_description"
-                        label="Description"
-                        variant="outlined"
-                        fullWidth
-                        multiline
-                        rows={4}
-                        value={user.path_description}
-                        onChange={handleChange}
-                        error={errors.path_description}
-                    />
+                <Grid item xs={12} sm={12}>
+                    <TinyMce onData={handleDescription} />
                 </Grid>
 
-              
+
 
                 <Grid item xs={12}>
                     {user.file && (

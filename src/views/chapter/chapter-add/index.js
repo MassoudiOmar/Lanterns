@@ -4,6 +4,8 @@ import { TextField, Button, Grid, Box, MenuItem, Snackbar, SnackbarContent, Inpu
 import axios from 'axios';
 import { useHistory, useParams } from 'react-router-dom';
 import configData from '../../../config';
+import TinyMce from '../../../ui-component/Tiny';
+import Questionnaire from "../Questionnaire"
 
 const AddChapter = () => {
     const history = useHistory();
@@ -13,16 +15,23 @@ const AddChapter = () => {
     const [hovered, setHovered] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState({ color: "", msg: "" });
-    const [errors, setErrors] = useState({}); // State to manage form errors
+    const [errors, setErrors] = useState({})
 
     const [user, setUser] = useState({
         lesson_title: '',
-        lesson_description: '',
+        lesson_description: null,
         lesson_image: '',
-
-        lesson_type: '',
+        duration: '',
+        deadline: 'dd/mm/yyy',
+        lesson_type: 'assignment',
+        chapter_id: id,
         file: null
     });
+
+    const handleDescription = (e) => {
+        setUser({ ...user, lesson_description: e });
+    };
+
 
     const handleChange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value });
@@ -31,7 +40,7 @@ const AddChapter = () => {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setUser({ ...user, lesson_image: file.name, file: file });
+            setUser({ ...user, lesson_image: file, file: file });
         }
     };
 
@@ -41,38 +50,31 @@ const AddChapter = () => {
 
     const handleSubmit = () => {
         let formErrors = {};
-        let hasErrors = false;
 
-        // Check for empty fields
-        Object.keys(user).forEach((key) => {
-            if (!user[key]) {
-                formErrors[key] = true;
-                hasErrors = true;
-            } else {
-                formErrors[key] = false;
-            }
-        });
 
-        if (!user.file) {
-            formErrors['file'] = true;
-            hasErrors = true;
-        } else {
-            formErrors['file'] = false;
-        }
 
-        if (hasErrors) {
-            setErrors(formErrors);
-            setSnackbarMessage({ color: "red", msg: "Veuillez remplir tous les champs." });
-            setSnackbarOpen(true);
-            return;
-        }
+        // let data = {};
+
+        // switch (timeValue) {
+        //     case "Leçon":
+        //         data = { lesson_description: user?.lesson_description, duration: user?.duration, lesson_type: user?.lesson_type, lesson_image: user?.lesson_image, lesson_title: user.lesson_title, path_id: id };
+        //         break;
+        //     case "Examen":
+        //         data = { deadline: user?.deadline, lesson_description: user?.lesson_description, duration: user?.duration, lesson_title: user.lesson_title, path_id: id };
+        //         break;
+        //     default:
+        //         data = null;
+        //         break;
+        // }
+
 
         let Lantern = localStorage.getItem('Lantern-account');
         let tokenObj = JSON.parse(Lantern);
         let token = tokenObj.token;
-        let data
-        data = { ...user, path_id: id }
-        axios.post(`${configData.API_SERVER}` + "lessons", data, {
+        console.log(user);
+        let data = { ...user, lesson_type: "assignment", path_id: id }
+
+        axios.post(`${configData.API_SERVER}` + "lessons", user, {
             headers: {
                 'Authorization': JSON.parse(token)
             }
@@ -104,29 +106,41 @@ const AddChapter = () => {
     };
 
 
-    const [timeValue, setTimeValue] = React.useState(false);
+    const [timeValue, setTimeValue] = React.useState('Leçon');
     const handleChangeTime = (event, newValue) => {
         setTimeValue(newValue);
     };
     return (
         <MainCard title={`Ajouter un ${!timeValue ? 'leçon' : 'examen'}`} >
-            <Grid item style={{ marginBottom: "1rem", }}>
+            <Grid item >
                 <Button
                     disableElevation
-                    variant={timeValue ? 'contained' : 'string'}
+                    variant={timeValue === 'Leçon' ? 'contained' : 'outlined'}
+                    style={{ margin: "0.5rem" }}
                     size="small"
-                    style={{ marginRight: "1rem" }}
-                    onClick={(e) => handleChangeTime(e, true)}
+                    onClick={(e) => handleChangeTime(e, 'Leçon')}
                 >
-                    Examen
+                    Leçon
                 </Button>
                 <Button
                     disableElevation
-                    variant={!timeValue ? 'contained' : 'string'}
+                    variant={timeValue === 'Examen' ? 'contained' : 'outlined'}
                     size="small"
-                    onClick={(e) => handleChangeTime(e, false)}
+                    style={{ margin: "0.5rem" }}
+                    onClick={(e) => handleChangeTime(e, 'Examen')}
                 >
-                    Leçon
+                    Examen
+                </Button>
+
+                <Button
+                    disableElevation
+                    variant={timeValue === 'Questionnaire' ? 'contained' : 'outlined'}
+                    size="small"
+                    style={{ margin: "0.5rem" }}
+
+                    onClick={(e) => handleChangeTime(e, 'Questionnaire')}
+                >
+                    Quizz
                 </Button>
             </Grid>
             <Snackbar
@@ -145,146 +159,243 @@ const AddChapter = () => {
                     message={snackbarMessage.msg}
                 />
             </Snackbar>
-            <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        name="lesson_title"
-                        label="Titre"
-                        variant="outlined"
-                        fullWidth
-                        value={user.lesson_title}
-                        onChange={handleChange}
-                        error={errors.lesson_title} // Apply error style if true
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        name="lesson_image"
-                        label="Nom de la fichier"
-                        variant="outlined"
-                        fullWidth
-                        error={errors.lesson_image}
-                        value={user.lesson_image}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment onClick={handleEditIconClick} position="end">
-                                    <Button variant="contained" color="primary" component="span">
-                                        Sélectionnez une fichier
-                                    </Button>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*,video/*,.pdf"
-                        style={{ display: 'none' }}
-                        onChange={handleFileChange}
-                    />
-                </Grid>
+            {
+                timeValue === 'Leçon' ?
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                name="lesson_title"
+                                label="Titre"
+                                variant="outlined"
+                                fullWidth
+                                value={user.lesson_title}
+                                onChange={handleChange}
+                                error={errors.lesson_title} // Apply error style if true
+                            />
+                        </Grid>
 
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        name="lesson_type"
-                        label="type"
-                        variant="outlined"
-                        fullWidth
-                        value={user.lesson_type}
-                        onChange={handleChange}
-                        error={errors.lesson_type} // Apply error style if true
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField
-                        name="lesson_description"
-                        label="Description"
-                        variant="outlined"
-                        fullWidth
 
-                        rows={4}
-                        value={user.lesson_description}
-                        onChange={handleChange}
-                        error={errors.lesson_description} // Apply error style if true
-                    />
-                </Grid>
-                {!timeValue && user?.file?.type?.startsWith('video/') && <Grid item xs={12} sm={12}>
-                    <TextField
-                        name="path_description"
-                        label="Soutitrage (Optionnel)"
-                        variant="outlined"
-                        fullWidth
-                        multiline
-                        rows={4}
-                        value={user.path_description}
-                        onChange={handleChange}
-                        error={errors.path_description}
-                    />
-                </Grid>}
-                <Grid item xs={12}>
-                    <Box display="flex" justifyContent="center" position="relative">
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*,video/*,.pdf"
-                            style={{ display: 'none' }}
-                            onChange={handleFileChange}
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                type="number"
+                                name="duration"
+                                label="Durée (en minutes)"
+                                variant="outlined"
+                                fullWidth
+                                value={user.duration}
+                                onChange={handleChange}
+                                error={errors.duration}
+                                InputProps={{
+                                    inputProps: { min: 0 } // Set minimum value to 0
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                select
+                                name="socialMedia"
+                                label="Type"
+                                variant="outlined"
+                                fullWidth
+                                value={user.socialMedia}
+                                onChange={(event) => {
+                                    handleChange(event);
+                                }}
+                            >
+                                {[
+                                    "Text",
+                                    "Video",
+                                    "PDF"
+                                ].map((role, i) => (
+                                    <MenuItem key={role} value={role}>
+                                        {role}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                name="lesson_image"
+                                label="Nom de la fichier"
+                                variant="outlined"
+                                fullWidth
+                                error={errors.lesson_image}
+                                value={user.lesson_image.name}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment onClick={handleEditIconClick} position="end">
+                                            <Button variant="contained" color="primary" component="span">
+                                                Sélectionnez une fichier
+                                            </Button>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*,video/*,.pdf"
+                                style={{ display: 'none' }}
+                                onChange={handleFileChange}
+                            />
+                        </Grid>
 
-                        />
-                        {user.file ? (
-                            <div>
-                                {user.file.type.startsWith('image/') ? (
-                                    <img
-                                        src={URL.createObjectURL(user.file)}
-                                        alt="Selected Image"
-                                        style={{
-                                            height: "100%",
-                                            width: "100%",
-                                            borderRadius: 10,
-                                            cursor: 'pointer',
-                                        }}
-                                    />
-                                ) : user.file.type.startsWith('video/') ? (
-                                    <video
-                                        style={{
-                                            height: "100%",
-                                            width: "100%",
-                                            borderRadius: 10,
-                                            cursor: "pointer"
-                                        }}
-                                        controls
-                                    >
-                                        <source src={URL.createObjectURL(user.file)} type={user.file.type} />
-                                        Your browser does not support the video tag.
-                                    </video>
-                                ) : user.file.type === 'application/pdf' ? (
-                                    <embed
-                                        src={URL.createObjectURL(user.file)}
-                                        type="application/pdf"
 
-                                        maxHeight="100%"
-                                        height="100px"
-                                        style={{ minHeight: '600px' }}
-                                    />
+                        <Grid item xs={12} sm={12}>
+                            <TinyMce onData={handleDescription} />
+                        </Grid>
+                        {user?.file?.type?.startsWith('video/') && <Grid item xs={12} sm={12}>
+                            <TextField
+                                name="path_description"
+                                label="Soutitrage (Optionnel)"
+                                variant="outlined"
+                                fullWidth
+                                multiline
+                                rows={4}
+                                value={user.Soutitrage}
+                                onChange={handleChange}
+                                error={errors.path_description}
+                            />
+                        </Grid>}
+                        <Grid item xs={12} sm={12}>
+                            <Box display="flex" justifyContent="center" position="relative">
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*,video/*,.pdf"
+                                    style={{ display: 'none' }}
+                                    onChange={handleFileChange}
+
+                                />
+                                {user.file ? (
+                                    <div style={{ width: "100%" }}>
+                                        {user.file.type.startsWith('image/') ? (
+                                            <img
+                                                src={URL.createObjectURL(user.file)}
+                                                alt="Selected Image"
+                                                style={{
+                                                    height: "100%",
+                                                    width: "100%",
+                                                    borderRadius: 10,
+                                                    cursor: 'pointer',
+                                                }}
+                                            />
+                                        ) : user.file.type.startsWith('video/') ? (
+                                            <video
+                                                style={{
+                                                    height: "100%",
+                                                    width: "100%",
+                                                    borderRadius: 10,
+                                                    cursor: "pointer"
+                                                }}
+                                                controls
+                                            >
+                                                <source src={URL.createObjectURL(user.file)} type={user.file.type} />
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        ) : user.file.type === 'application/pdf' ? (
+                                            <embed
+                                                src={URL.createObjectURL(user.file)}
+                                                type="application/pdf"
+                                                width={"100%"}
+                                                maxHeight="100%"
+                                                height="100px"
+                                                style={{ minHeight: '600px' }}
+                                            />
+                                        ) : (
+                                            <p>Aucun aperçu disponible pour ce type de fichier</p>
+                                        )}
+
+                                    </div>
                                 ) : (
-                                    <p>Aucun aperçu disponible pour ce type de fichier</p>
+                                    <div>
+                                        <p>Aucun fichier sélectionné</p>
+                                    </div>
                                 )}
+                            </Box>
+                        </Grid>
 
-                            </div>
-                        ) : (
-                            <div>
-                                <p>Aucun fichier sélectionné</p>
-                            </div>
-                        )}
-                    </Box>
-                </Grid>
+                        <Grid item xs={12}>
+                            <Button variant="outlined" color="primary" onClick={handleSubmit}>
+                                Ajouter un leçon
+                            </Button>
+                        </Grid>
+                    </Grid>
+                    :
+                    timeValue === 'Examen' ?
 
-                <Grid item xs={12}>
-                    <Button variant="outlined" color="primary" onClick={handleSubmit}>
-                        Ajouter un {!timeValue ? 'leçon' : 'examen'}
-                    </Button>
-                </Grid>
-            </Grid>
+                        <Grid container spacing={3}>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    name="lesson_title"
+                                    label="Titre"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={user.lesson_title}
+                                    onChange={handleChange}
+                                    error={errors.lesson_title} // Apply error style if true
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    type="number"
+                                    name="duration"
+                                    label="Durée (en minutes)"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={user.duration}
+                                    onChange={handleChange}
+                                    error={errors.duration}
+                                    InputProps={{
+                                        inputProps: { min: 0 } // Set minimum value to 0
+                                    }}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={12}>
+                                <TextField
+                                    type="date"
+                                    name="deadline"
+                                    label="Date limite"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={user.deadline}
+                                    onChange={handleChange}
+                                    error={errors.deadline}
+
+                                />
+
+                            </Grid>
+                            <Grid item xs={12} sm={12}>
+                                <TinyMce onData={handleDescription} />
+                            </Grid>
+                            {user?.file?.type?.startsWith('video/') && <Grid item xs={12} sm={12}>
+                                <TextField
+                                    name="path_description"
+                                    label="Soutitrage (Optionnel)"
+                                    variant="outlined"
+                                    fullWidth
+                                    multiline
+                                    rows={4}
+                                    value={user.path_description}
+                                    onChange={handleChange}
+                                    error={errors.path_description}
+                                />
+                            </Grid>}
+
+
+                            <Grid item xs={12}>
+                                <Button variant="outlined" color="primary" onClick={handleSubmit}>
+                                    Ajouter un examen
+                                </Button>
+                            </Grid>
+                        </Grid>
+                        :
+                        timeValue === 'Questionnaire' ?
+
+                            <Questionnaire />
+                            : null
+            }
         </MainCard >
     );
 };

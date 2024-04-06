@@ -36,7 +36,7 @@ const PermissionByRoleEdit = () => {
         let tokenObj = JSON.parse(Lantern)
         let token = tokenObj.token
 
-        axios.get(`http://localhost:3000/api/v1/roles/${id}`, {
+        axios.get(`${configData.API_SERVER}roles/${id}`, {
             headers: {
                 'Authorization': JSON.parse(token)
             }

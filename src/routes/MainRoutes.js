@@ -20,13 +20,6 @@ const hasPermission = (permission) => {
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('../views/dashboard/Default')));
 
-// utilities routing
-// const UtilsTypography = Loadable(lazy(() => import('../views/utilities/Typography')));
-// const UtilsColor = Loadable(lazy(() => import('../views/utilities/Color')));
-// const UtilsShadow = Loadable(lazy(() => import('../views/utilities/Shadow')));
-// const UtilsMaterialIcons = Loadable(lazy(() => import('../views/utilities/MaterialIcons')));
-// const UtilsTablerIcons = Loadable(lazy(() => import('../views/utilities/TablerIcons')));
-
 // sample page users
 const Users = Loadable(lazy(() => import('../views/users/users')));
 const AddUser = Loadable(lazy(() => import('../views/users/add-user')));
@@ -42,7 +35,11 @@ const AddCohort = Loadable(lazy(() => import('../views/cohort/cohort-add')));
 const EditCohort = Loadable(lazy(() => import('../views/cohort/edit-cohort')));
 const AffectUsers = Loadable(lazy(() => import('../views/cohort/affect-users')));
 
-// sample page chapter
+
+const ADDCHAPTER = Loadable(lazy(() => import('../views/cohort/chapitre')));
+const EDITCHAPITRE = Loadable(lazy(() => import('../views/cohort/chpitre-edit')));
+
+// sample page lesson
 const Chapters = Loadable(lazy(() => import('../views/chapter/chapter-list')));
 const EditChapter = Loadable(lazy(() => import('../views/chapter/edit-chapter')));
 const AddChapter = Loadable(lazy(() => import('../views/chapter/chapter-add')));
@@ -64,6 +61,7 @@ const scholarships = Loadable(lazy(() => import('../views/autre/schollarship/sch
 const Etablissement = Loadable(lazy(() => import('../views/establishment/establishment-list')));
 const EditEtablissement = Loadable(lazy(() => import('../views/establishment/establishment-edit')));
 const ADDEtablissement = Loadable(lazy(() => import('../views/establishment/establishment-add')));
+const AFFECTEtablissement = Loadable(lazy(() => import('../views/establishment/affect-establishment')));
 
 
 //-----------------------|| MAIN ROUTING ||-----------------------//
@@ -92,6 +90,9 @@ const MainRoutes = () => {
                 '/ajoute-cohorte',
                 '/edit-cohorte/:id',
 
+                '/ajoute-chapitre/:id',
+                '/edite-chapitre/:id',
+
                 '/leçons',
                 '/edit-leçon/:id',
                 '/ajoute-leçon/:id',
@@ -111,6 +112,7 @@ const MainRoutes = () => {
                 '/edit-etablissement/:id',
 
                 '/affect-utilisateurs',
+                '/affect-establissement/:id',
 
 
             ]}
@@ -120,36 +122,39 @@ const MainRoutes = () => {
                     <AuthGuard>
                         <Route path="/dashboard/default" component={DashboardDefault} />
 
-                        {hasPermission('user_get_all') && (
-                            <>
-                                <Route path="/utilisateurs" component={Users} />
-                                <Route path="/ajouter-utilisateur" component={AddUser} />
-                                <Route path="/edit-utilisateur/:id" component={EditUser} />
-                            </>
-                        )}
-                        {hasPermission('permissions_get_all') && (
-                            <>
-                                <Route path="/permissions" component={Permission} />
-                                <Route path="/ajoute-permission" component={AddPermission} />
-                            </>
-                        )}
+                        {/* {hasPermission('user_get_all') && ( */}
+                        <>
+                            <Route path="/utilisateurs" component={Users} />
+                            <Route path="/ajouter-utilisateur" component={AddUser} />
+                            <Route path="/edit-utilisateur/:id" component={EditUser} />
+                        </>
+                        {/* )} */}
+                        {/* {hasPermission('permissions_get_all') && ( */}
+                        <>
+                            <Route path="/permissions" component={Permission} />
+                            <Route path="/ajoute-permission" component={AddPermission} />
+                        </>
+                        {/* )} */}
 
-                        {hasPermission('path_get_all') && (
-                            <>
-                                <Route path="/cohorts" component={Cohorts} />
-                                <Route path="/ajoute-cohorte" component={AddCohort} />
-                                <Route path="/edit-cohorte/:id" component={EditCohort} />
-                                <Route path="/affect-utilisateurs" component={AffectUsers} />
-                            </>
-                        )}
+                        {/* {hasPermission('path_get_all') && ( */}
+                        <>
+                            <Route path="/cohorts" component={Cohorts} />
+                            <Route path="/ajoute-cohorte" component={AddCohort} />
+                            <Route path="/edit-cohorte/:id" component={EditCohort} />
+                            <Route path="/affect-utilisateurs" component={AffectUsers} />
 
-                        {hasPermission('lesson_get_all') && (
-                            <>
-                                <Route path="/leçons" component={Chapters} />
-                                <Route path="/edit-leçon/:id" component={EditChapter} />
-                                <Route path="/ajoute-leçon/:id" component={AddChapter} />
-                            </>
-                        )}
+                            <Route path="/ajoute-chapitre/:id" component={ADDCHAPTER} />
+                            <Route path="/edite-chapitre/:id" component={EDITCHAPITRE} />
+                        </>
+                        {/* )} */}
+
+                        {/* //  {hasPermission('lesson_get_all') && ( */}
+                        <>
+                            <Route path="/leçons" component={Chapters} />
+                            <Route path="/edit-leçon/:id" component={EditChapter} />
+                            <Route path="/ajoute-leçon/:id" component={AddChapter} />
+                        </>
+                        {/* )} */}
 
                         {hasPermission('permissions_get_all') && (
                             <Route path="/edit-permission-rôle/:id" component={EditPermissionRole} />
@@ -166,6 +171,7 @@ const MainRoutes = () => {
                         <Route path="/etablissements" component={Etablissement} />
                         <Route path="/ajouter-etablissement" component={ADDEtablissement} />
                         <Route path="/edit-etablissement/:id" component={EditEtablissement} />
+                        <Route path="/affect-establissement/:id" component={AFFECTEtablissement} />
 
 
                     </AuthGuard>

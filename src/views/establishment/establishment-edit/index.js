@@ -41,7 +41,7 @@ const EditEstablishment = () => {
     const getEstablishment = async () => {
         try {
             const token = JSON.parse(getToken());
-            const res = await axios.get(configData.API_SERVER + `establishments/${id}`, {
+            const res = await axios.get("${configData.API_SERVER}" + `establishments/${id}`, {
                 headers: {
                     'Authorization': token
                 }

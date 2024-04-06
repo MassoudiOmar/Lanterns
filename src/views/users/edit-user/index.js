@@ -4,12 +4,14 @@ import axios from 'axios';
 import { useHistory, useParams } from 'react-router-dom';
 import MainCard from '../../../ui-component/cards/MainCard';
 import configData from '../../../config';
+import TinyMce from '../../../ui-component/Tiny';
 
 const EditUser = () => {
     const history = useHistory();
     const { id } = useParams();
     const [Roles, setRoles] = useState([]);
-
+    const [socialMediaInputs, setSocialMediaInputs] = useState([]);
+    console.log(socialMediaInputs, "here");
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState({ color: '', msg: '' });
     const [user, setUser] = useState({
@@ -19,10 +21,16 @@ const EditUser = () => {
         role_id: 0,
         birthday: '',
 
+        description: '',
+        socials: '',
+        post: '',
+
         createdAt: '',
         updatedAt: ''
     });
-
+    const handleDescription = (e) => {
+        setUser({ ...user, description: e });
+    };
     useEffect(() => {
         getUser();
     }, []);
@@ -30,6 +38,30 @@ const EditUser = () => {
     useEffect(() => {
         getRoles()
     }, [])
+
+    const handleChanges = (index, e) => {
+        const { name, value } = e.target;
+        const updatedInputs = [...socialMediaInputs];
+        updatedInputs[index] = { ...updatedInputs[index], [name]: value };
+        setSocialMediaInputs(updatedInputs);
+        const updatedUser = { ...user };
+        updatedUser.socials[index] = { socialMedia: updatedInputs[index].socialMedia, link: updatedInputs[index].link };
+        setUser(updatedUser);
+    };
+    const handleAddInput = () => {
+        setSocialMediaInputs([...socialMediaInputs, { socialMedia: '', link: '' }]);
+    };
+
+    const handleRemoveInput = (index) => {
+        const updatedInputs = [...socialMediaInputs];
+        updatedInputs.splice(index, 1);
+        setSocialMediaInputs(updatedInputs);
+        const updatedUser = { ...user };
+        updatedUser.socials.splice(index, 1);
+        setUser(updatedUser);
+    };
+
+
     const getRoles = () => {
         let Lantern = localStorage.getItem('Lantern-account')
         let tokenObj = JSON.parse(Lantern)
@@ -58,7 +90,10 @@ const EditUser = () => {
                     'Authorization': token
                 }
             });
+            console.log(res.data.socials, "red");
             setUser(res.data);
+            let resDataSocials = JSON.parse(res.data.socials)
+            setSocialMediaInputs(resDataSocials);
         } catch (error) {
             handleRequestError(error);
         }
@@ -74,7 +109,7 @@ const EditUser = () => {
 
     const handleSubmit = async () => {
         try {
-            console.log(user)
+
             const token = JSON.parse(getToken());
             await axios.put(configData.API_SERVER + `users/${id}`, user, {
                 headers: {
@@ -164,6 +199,17 @@ const EditUser = () => {
                         onChange={handleChange}
                     />
                 </Grid>
+                {user.post && <Grid item xs={12} sm={6}>
+                    <TextField
+                        name="post"
+                        label="Post Actuel"
+                        type='text'
+                        variant="outlined"
+                        fullWidth
+                        value={user.post}
+                        onChange={handleChange}
+                    />
+                </Grid>}
                 <Grid item xs={12} sm={6}>
                     <TextField
                         name="role_id"
@@ -181,16 +227,78 @@ const EditUser = () => {
                         ))}
                     </TextField>
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={12}>
                     <TextField
+                        type="date"
                         name="birthday"
-                        label="birthday"
                         variant="outlined"
+                        label="Date de naissance"
                         fullWidth
                         value={user.birthday}
                         onChange={handleChange}
+
                     />
                 </Grid>
+
+                {/* {user.socials && socialMediaInputs?.map((input, index) => (
+                    <>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                select
+                                name="socialMedia"
+                                label="Réseaux Sociaux"
+                                variant="outlined"
+                                fullWidth
+                                value={input.socialMedia}
+                                onChange={(e) => handleChanges(index, e)}
+                            >
+                                {[
+                                    "Facebook",
+                                    "Twitter",
+                                    "Snapchat",
+                                    "Tumblr",
+                                    "Linkedin",
+                                    "Viadeo",
+                                    "Instagram",
+                                    "Pinterest"
+                                ]?.map((role, i) => (
+                                    <MenuItem key={role} value={role}>
+                                        {role}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                name="link"
+                                label="Lien du réseau social sélectionné"
+                                variant="outlined"
+                                fullWidth
+                                value={input.link}
+                                onChange={(e) => handleChanges(index, e)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={2} style={{ display: "flex", alignItems: "center" }}>
+                            {index === socialMediaInputs.length - 1 && (
+                                <>
+                                    {/* <Button variant="outlined" color="primary" onClick={handleAddInput}>
+                                        +
+                                    </Button> */}
+                {/* {socialMediaInputs.length > 1 && (
+                                        <Button
+                                            variant="outlined"
+                                            color="error"
+                                            onClick={() => handleRemoveInput(index)}
+                                            style={{ marginLeft: "8px" }}
+                                        >
+                                            -
+                                        </Button>
+                         
+                      
+                )) */}
+                {user.description && <Grid item xs={12} sm={12}>
+                    <TinyMce onData={handleDescription} data={user.description} />
+                </Grid>}
                 <Grid item xs={12} sm={6}>
                     <TextField
                         name="createdAt"

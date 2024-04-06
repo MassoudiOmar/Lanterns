@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TableContainer, Table, TableHead, TableBody, TableRow, TableCell, IconButton, Paper, TextField, Button, Typography } from '@material-ui/core';
-import { Edit as EditIcon, Delete as DeleteIcon } from '@material-ui/icons';
+import { Edit as EditIcon, Delete as DeleteIcon, PersonAdd } from '@material-ui/icons';
 import MainCard from '../../../ui-component/cards/MainCard';
 import axios from "axios"
 import Snackbar from '@material-ui/core/Snackbar';
@@ -19,7 +19,7 @@ import configData from '../../../config';
 const Etablissement = () => {
     const history = useHistory();
 
-    const [users, setUsers] = useState([]);
+    const [users, setEstablishment] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [page, setPage] = useState(1);
@@ -27,8 +27,7 @@ const Etablissement = () => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [userToDeleteId, setUserToDeleteId] = useState(null);
     const [forbidden, setforbidden] = useState(false);
-    const [usersPermission, setUsersPermission] = useState([]);
-    console.log(usersPermission)
+    const [usersPermission, setEstablishmentPermission] = useState([]);
     const handleDelete = (userId) => {
         setUserToDeleteId(userId);
         setDeleteDialogOpen(true);
@@ -39,7 +38,7 @@ const Etablissement = () => {
         let tokenObj = JSON.parse(Lantern);
         let token = JSON.parse(tokenObj.perm);
         let userPermissions = token.filter(permission => permission.includes("user"));
-        setUsersPermission(userPermissions);
+        setEstablishmentPermission(userPermissions);
     }
 
     useEffect(() => {
@@ -62,7 +61,6 @@ const Etablissement = () => {
                 setSnackbarMessage({ color: "green", msg: res.data.message }); // Set response data to display in the snackbar
                 setSnackbarOpen(true); // Open the snackbar
                 setTimeout(() => { handleSnackbarClose() }, 1500)
-
             })
             .catch((err) => {
                 setSnackbarMessage({ color: "red", msg: err.response.data.message });
@@ -97,10 +95,12 @@ const Etablissement = () => {
                 }
             })
                 .then((res) => {
-                    setUsers(res.data);
+                    console.log(res.data);
+                    setEstablishment(res.data);
                     applyFilters(); // Apply filters initially
                 })
                 .catch((err) => {
+                    console.log(err.response);
                     if (err.response.data.message == 'Forbidden') {
                         setforbidden(true)
                     }
@@ -224,6 +224,10 @@ const Etablissement = () => {
                                                 <TableCell>
 
                                                     <>
+                                                        {usersPermission.includes('user_update') &&
+                                                            <IconButton style={{ color: "#2073c4" }} aria-label="edit" onClick={() => history.push(`/affect-establissement/${row.id}`)}>
+                                                                <PersonAdd />
+                                                            </IconButton>}
                                                         {usersPermission.includes('user_update') &&
                                                             <IconButton style={{ color: "#2073c4" }} aria-label="edit" onClick={() => history.push(`/edit-etablissement/${row.id}`)}>
                                                                 <EditIcon />

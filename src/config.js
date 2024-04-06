@@ -6,7 +6,7 @@ const config = {
     fontFamily: `'Roboto', sans-serif`,
     borderRadius: 12,
     variable: [],
-    API_SERVER: 'http://localhost:3000/api/v1/'
+    API_SERVER: 'https://backend-wkfu.onrender.com/api/v1/'
 };
 
 export default config;

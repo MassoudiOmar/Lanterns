@@ -115,38 +115,37 @@ const RestLogin = (props, { ...others }) => {
                         .then(function (response) {
                             if (response.data.success) {
                                 const user = jwtDecode(response.data.token);
-                                if (user.role_id == 1 || user.role_id == 2) {
-                                    axios.get(configData.API_SERVER + `roles/${user.role_id}`, {
-                                        headers: {
-                                            'Authorization': response.data.token
-                                        }
+                                // if (user.role_id == 1 || user.role_id == 2) {
+                                axios.get(configData.API_SERVER + `roles/${user.role_id}`, {
+                                    headers: {
+                                        'Authorization': response.data.token
+                                    }
+                                })
+                                    .then((res) => {
+                                        const { data: responseData } = response;
+                                        const { token } = responseData;
+
+                                        const { role_id: roleId, fullname } = user;
+
+                                        const permissions = res?.data?.permissions?.map(permission => permission?.perm_name);
+                                        dispatcher({ type: SET_VARIABLE, variable: permissions });
+                                        dispatcher({
+                                            type: ACCOUNT_INITIALIZE,
+                                            payload: {
+                                                token,
+                                                role: roleId,
+                                                fullname,
+                                                perm: permissions,
+                                                isLoggedIn: true
+                                            }
+                                        });
                                     })
-                                        .then((res) => {
-                                            const { data: responseData } = response;
-                                            const { token } = responseData;
+                                    .catch((err) => console.log(err))
 
-                                            const { role_id: roleId, fullname } = user;
+                                // } else {
+                                //     setErrors({ submit: 'Not Allowed!' });
 
-                                            const permissions = res?.data?.permissions?.map(permission => permission?.perm_name);
-                                            dispatcher({ type: SET_VARIABLE, variable: permissions });
-                                            dispatcher({
-                                                type: ACCOUNT_INITIALIZE,
-                                                payload: {
-                                                    token,
-                                                    role: roleId,
-                                                    fullname,
-                                                    perm: permissions,
-                                                    isLoggedIn: true
-                                                }
-                                            });
-                                        })
-                                        .catch((err) => console.log(err))
-
-                                } else {
-                                    setErrors({ submit: 'Not Allowed!' });
-
-                                }
-
+                                // }
                                 if (scriptedRef.current) {
                                     setStatus({ success: true });
                                     setSubmitting(false);

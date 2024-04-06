@@ -69,7 +69,7 @@ const AddChapter = () => {
         let tokenObj = JSON.parse(Lantern);
         let token = tokenObj.token;
 
-        axios.post(`http://localhost:3000/api/v1/lessons`, user, {
+        axios.post(`${configData.API_SERVER}lessons`, user, {
             headers: {
                 'Authorization': JSON.parse(token)
             }
@@ -109,7 +109,7 @@ const AddChapter = () => {
         let tokenObj = JSON.parse(Lantern);
         let token = tokenObj.token;
 
-        axios.get(`http://localhost:3000/api/v1/paths`, {
+        axios.get(`${configData.API_SERVER}paths`, {
             headers: {
                 'Authorization': JSON.parse(token)
             }

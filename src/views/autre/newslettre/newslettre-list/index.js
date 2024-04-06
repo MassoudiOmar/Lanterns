@@ -15,6 +15,7 @@ import Skeleton from '@material-ui/core/Skeleton';
 import { gridSpacing } from '../../../../store/constant';
 import { useHistory } from 'react-router-dom';
 import { CSVLink, CSVDownload } from "react-csv";
+import configData from '../../../../config';
 
 const NewsLettre = () => {
     const history = useHistory();
@@ -58,7 +59,7 @@ const NewsLettre = () => {
         let tokenObj = JSON.parse(Lantern)
         let token = tokenObj.token
 
-        axios.delete(`http://localhost:3000/api/v1/categories/${userToDeleteId}`, {
+        axios.delete(`${configData.API_SERVER}categories/${userToDeleteId}`, {
             headers: {
                 'Authorization': JSON.parse(token)
             }
@@ -94,7 +95,7 @@ const NewsLettre = () => {
             let tokenObj = JSON.parse(Lantern)
             let token = tokenObj.token
 
-            axios.get('http://localhost:3000/api/v1/users', {
+            axios.get(`${configData.API_SERVER}` + 'users', {
                 headers: {
                     'Authorization': JSON.parse(token)
                 }
@@ -140,7 +141,7 @@ const NewsLettre = () => {
         let Lantern = localStorage.getItem('Lantern-account')
         let tokenObj = JSON.parse(Lantern)
         let token = tokenObj.token
-        axios.put(`http://localhost:3000/api/v1/users/${id}`, data, {
+        axios.put(`${configData.API_SERVER}users/${id}`, data, {
             headers: {
                 'Authorization': JSON.parse(token)
             }

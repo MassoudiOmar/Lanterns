@@ -6,6 +6,7 @@ import SnackbarContent from '@material-ui/core/SnackbarContent';
 import EditIcon from '@material-ui/icons/Edit';
 import { useHistory, useParams } from 'react-router-dom';
 import axios from 'axios';
+import configData from '../../../config';
 
 const EditChapter = () => {
     const { id } = useParams();
@@ -50,7 +51,7 @@ const EditChapter = () => {
             let tokenObj = JSON.parse(Lantern)
             let token = tokenObj.token
 
-            const response = await axios.get(`http://localhost:3000/api/v1/lessons/${id}`, {
+            const response = await axios.get(`${configData.API_SERVER}lessons/${id}`, {
                 headers: {
                     'Authorization': JSON.parse(token)
                 }
@@ -73,7 +74,7 @@ const EditChapter = () => {
             let { lesson_description, lesson_image, lesson_title, lesson_price } = lesson
             let data = { lesson_description, lesson_image: '123', lesson_title, lesson_price: 10 }
 
-            const response = await axios.put(`http://localhost:3000/api/v1/lessons/${id}`, data, {
+            const response = await axios.put(`${configData.API_SERVER}lessons/${id}`, data, {
                 headers: {
                     'Authorization': JSON.parse(token)
                 }

@@ -51,7 +51,7 @@ const ChapterList = () => {
         let tokenObj = JSON.parse(Lantern)
         let token = tokenObj.token
 
-        axios.delete(`http://localhost:3000/api/v1/lessons/${userToDeleteId}`, {
+        axios.delete(`${configData.API_SERVER}lessons/${userToDeleteId}`, {
             headers: {
                 'Authorization': JSON.parse(token)
             }
@@ -87,7 +87,7 @@ const ChapterList = () => {
             let tokenObj = JSON.parse(Lantern)
             let token = tokenObj.token
 
-            axios.get('http://localhost:3000/api/v1/lessons', {
+            axios.get(`${configData.API_SERVER}`+'lessons', {
                 headers: {
                     'Authorization': JSON.parse(token)
                 }
@@ -133,7 +133,7 @@ const ChapterList = () => {
         let Lantern = localStorage.getItem('Lantern-account')
         let tokenObj = JSON.parse(Lantern)
         let token = tokenObj.token
-        axios.put(`http://localhost:3000/api/v1/users/${id}`, data, {
+        axios.put(`${configData.API_SERVER}users/${id}`, data, {
             headers: {
                 'Authorization': JSON.parse(token)
             }

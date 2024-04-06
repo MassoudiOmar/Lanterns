@@ -8,7 +8,7 @@ import { useHistory } from 'react-router-dom';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import configData from '../../../config';
 
-const AffectUsers = () => {
+const AffectEstablishment = () => {
     const history = useHistory();
 
     const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -44,7 +44,7 @@ const AffectUsers = () => {
                 formErrors[key] = false;
             }
         });
-       
+
 
         if (hasErrors) {
             setErrors(formErrors);
@@ -120,26 +120,8 @@ const AffectUsers = () => {
     };
 
     return (
-        <MainCard title="Affecter Utilisateurs">
-            <Grid item style={{ marginBottom: "1rem", }}>
-                <Button
-                    disableElevation
-                    variant={timeValue ? 'contained' : 'string'}
-                    size="small"
-                    style={{ marginRight: "1rem" }}
-                    onClick={(e) => handleChangeTime(e, true)}
-                >
-                    STUDENT
-                </Button>
-                <Button
-                    disableElevation
-                    variant={!timeValue ? 'contained' : 'string'}
-                    size="small"
-                    onClick={(e) => handleChangeTime(e, false)}
-                >
-                    INSTRUCTOR
-                </Button>
-            </Grid>
+        <MainCard title="Affecter Establissment">
+
             <Snackbar
                 anchorOrigin={{
                     vertical: 'top',
@@ -232,4 +214,4 @@ const AffectUsers = () => {
     );
 };
 
-export default AffectUsers;
+export default AffectEstablishment;

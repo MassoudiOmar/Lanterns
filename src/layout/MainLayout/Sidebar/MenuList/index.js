@@ -8,6 +8,7 @@ const MenuList = () => {
     const customization = useSelector((state) => state.customization);
     const [loading, setLoading] = useState(true);
     const [menuItems, setMenuItems] = useState([]);
+
     useEffect(() => {
         filterMenuItems();
     }, [customization.variable]);

@@ -1,18 +1,46 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import MainCard from '../../../ui-component/cards/MainCard';
-import { TextField, Button, Grid, MenuItem } from '@material-ui/core';
+import { TextField, Button, Grid, MenuItem, InputAdornment } from '@material-ui/core';
 import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import axios from 'axios'
 import { useHistory } from 'react-router-dom';
 import configData from '../../../config';
+import TinyMce from '../../../ui-component/Tiny';
 
 const AddUser = () => {
     const history = useHistory();
-    const [timeValue, setTimeValue] = React.useState(false);
-    const handleChangeTime = (event, newValue) => {
-        setTimeValue(newValue);
+    const fileInputRef = useRef(null);
+    const [socialMediaInputs, setSocialMediaInputs] = useState([{ socialMedia: '', link: '' }]);
+
+    const handleChanges = (index, e) => {
+        const { name, value } = e.target;
+        const updatedInputs = [...socialMediaInputs];
+        updatedInputs[index] = { ...updatedInputs[index], [name]: value };
+        setSocialMediaInputs(updatedInputs);
+        const updatedUser = { ...user };
+        updatedUser.socials[index] = { socialMedia: updatedInputs[index].socialMedia, link: updatedInputs[index].link };
+        setUser(updatedUser);
     };
+
+    const handleDescription = (e) => {
+        setUser({ ...user, description: e });
+    };
+
+
+    const handleAddInput = () => {
+        setSocialMediaInputs([...socialMediaInputs, { socialMedia: '', link: '' }]);
+    };
+
+    const handleRemoveInput = (index) => {
+        const updatedInputs = [...socialMediaInputs];
+        updatedInputs.splice(index, 1);
+        setSocialMediaInputs(updatedInputs);
+        const updatedUser = { ...user };
+        updatedUser.socials.splice(index, 1);
+        setUser(updatedUser);
+    };
+
 
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [Establishments, setEstablishments] = useState(false);
@@ -35,11 +63,15 @@ const AddUser = () => {
         role_id: '',
         email: '',
         password: '',
-        birthday: '',
+        birthday: 'dd/mm/yyy',
+        post: '',
+        photo: '',
+        type: '',
+        description: '',
         plan: 'null',
         cover_letter: 'null',
         etablissement: '',
-
+        socials: []
     });
 
 
@@ -61,7 +93,7 @@ const AddUser = () => {
             }
         })
             .then((res) => {
-                setRoles(res.data.map((e) => e.role_name));
+                setRoles(res.data?.map((e) => e.role_name));
             })
             .catch((err) => {
                 console.log(err?.response)
@@ -69,6 +101,19 @@ const AddUser = () => {
                 setSnackbarOpen(true);
                 setTimeout(() => { handleSnackbarClose() }, 1500);
             });
+    };
+
+    const handleEditIconClick = () => {
+        fileInputRef.current.click();
+    };
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            setUser({ ...user, photo: file, file: file });
+        } else {
+            setSnackbarMessage({ color: "red", msg: "Veuillez sélectionner un fichier image." });
+            setSnackbarOpen(true);
+        }
     };
 
     const handleSubmit = () => {
@@ -84,19 +129,43 @@ const AddUser = () => {
                 formErrors[key] = false;
             }
         });
-        console.log(user)
 
-        if (hasErrors) {
-            setErrors(formErrors);
-            setSnackbarMessage({ color: "red", msg: "Veuillez remplir tous les champs." });
-            setSnackbarOpen(true);
-            return;
-        }
+        // if (hasErrors) {
+        //     setErrors(formErrors);
+        //     setSnackbarMessage({ color: "red", msg: "Veuillez remplir tous les champs." });
+        //     setSnackbarOpen(true);
+        //     return;
+        // }
 
         let Lantern = localStorage.getItem('Lantern-account')
         let tokenObj = JSON.parse(Lantern)
         let token = tokenObj.token
-        axios.post(`http://localhost:3000/api/v1/users`, user, {
+
+        // Create a new FormData object
+        const formData = new FormData();
+
+        var socialsArray = user.socials;
+
+        var socialsJSON = JSON.stringify(socialsArray);
+
+        formData.append('fullname', user.fullname);
+        formData.append('phone', user.phone);
+        formData.append('role_id', user.role_id);
+        formData.append('email', user.email);
+        formData.append('password', user.password);
+        formData.append('birthday', user.birthday);
+        formData.append('plan', user.plan);
+        formData.append('cover_letter', user.cover_letter);
+        formData.append('socials', socialsJSON);
+        formData.append('photo', user.photo);
+        formData.append('post', user.post);
+        formData.append('etablissement', user.etablissement);
+        formData.append('description', user.description);
+        formData.append('cv', "null");
+
+
+     
+        axios.post(`${configData.API_SERVER}` + "users", formData, {
             headers: {
                 'Authorization': JSON.parse(token)
             }
@@ -108,7 +177,7 @@ const AddUser = () => {
                 setUser({
                     fullname: '',
                     phone: '',
-                    role_id: 0,
+                    role_id: '',
                     email: '',
                     password: '',
                     birthday: '',
@@ -117,7 +186,6 @@ const AddUser = () => {
                     etablissement: ''
                 });
                 setTimeout(() => { history.goBack() }, 2000);
-
             })
             .catch((err) => {
                 console.log(err.response);
@@ -127,13 +195,14 @@ const AddUser = () => {
             });
     };
 
+
     const handleSnackbarClose = () => {
         setSnackbarOpen(false);
     };
 
-    useEffect(() => {
-        getEstablishment();
-    }, []);
+    // useEffect(() => {
+    //     getEstablishment();
+    // }, []);
 
     const getEstablishment = () => {
         try {
@@ -161,25 +230,6 @@ const AddUser = () => {
 
     return (
         <MainCard title="Ajouter un utilisateur">
-            {/* <Grid item style={{ marginBottom: "1rem", }}>
-                <Button
-                    disableElevation
-                    variant={timeValue ? 'contained' : 'string'}
-                    size="small"
-                    style={{ marginRight: "1rem" }}
-                    onClick={(e) => handleChangeTime(e, true)}
-                >
-                    AUTRE
-                </Button>
-                <Button
-                    disableElevation
-                    variant={!timeValue ? 'contained' : 'string'}
-                    size="small"
-                    onClick={(e) => handleChangeTime(e, false)}
-                >
-                    ETUDIANT(e)
-                </Button>
-            </Grid> */}
             <Snackbar
                 anchorOrigin={{
                     vertical: 'top',
@@ -231,7 +281,6 @@ const AddUser = () => {
                         error={errors.phone}
                     />
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
                     <TextField
                         select
@@ -240,7 +289,9 @@ const AddUser = () => {
                         variant="outlined"
                         fullWidth
                         value={user.role_id}
-                        onChange={handleChange}
+                        onChange={(event) => {
+                            handleChange(event);
+                        }}
                         error={errors.role_id}
                     >
                         {Roles?.map((role, i) => (
@@ -249,7 +300,31 @@ const AddUser = () => {
                             </MenuItem>
                         ))}
                     </TextField>
+
                 </Grid>
+
+                {user.role_id && user.role_id == 3 &&
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            select
+                            name="type"
+                            label="type"
+                            variant="outlined"
+                            fullWidth
+                            value={user.type}
+                            onChange={(event) => {
+                                handleChange(event);
+                            }}
+                            error={errors.type}
+                        >
+                            {["B2B", "B2C"]?.map((role, i) => (
+                                <MenuItem key={role} value={role}>
+                                    {role}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+
+                    </Grid>}
 
                 <Grid item xs={12} sm={6}>
                     <TextField
@@ -265,19 +340,19 @@ const AddUser = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
+                        type="date"
                         name="birthday"
-                        label="Date de naissance"
-                        type="birthday"
                         variant="outlined"
+                        label="Date de naissance"
                         fullWidth
                         value={user.birthday}
                         onChange={handleChange}
                         error={errors.birthday}
                     />
                 </Grid>
-                {
+                {/* {
                     user.role_id && user.role_id == 2 || user.role_id == 3 ?
-                        <Grid item xs={12} sm={12}>
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 select
                                 name="etablissement"
@@ -298,37 +373,119 @@ const AddUser = () => {
                                     </MenuItem>))}
                             </TextField>
                         </Grid> : null
-                }
-                {/* {!timeValue &&
-                    <>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                name="plan"
-                                label="plan"
-                                type="plan"
-                                variant="outlined"
-                                fullWidth
-                                value={user.plan}
-                                onChange={handleChange}
-                                error={errors.plan}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                name="cover_letter"
-                                label="cover_letter"
-                                type="cover_letter"
-                                variant="outlined"
-                                fullWidth
-                                value={user.cover_letter}
-                                onChange={handleChange}
-                                error={errors.cover_letter}
-                            />
-                        </Grid>
-                    </>
-
                 } */}
+                <Grid item xs={12} sm={6}>
+                    <TextField
+                        name="photo"
+                        label="Image"
+                        variant="outlined"
+                        fullWidth
+                        value={user?.photo?.name}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment onClick={handleEditIconClick} position="end">
+                                    <Button variant="contained" color="primary" component="span">
+                                        Sélectionnez un fichier
+                                    </Button>
+                                </InputAdornment>
+                            ),
+                        }}
+                        error={errors.photo}
+                    />
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={handleFileChange}
+                    />
+                </Grid>
+                {
+                    user.role_id && user.role_id == 2 ?
+                        <>
+
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+
+                                    name="post"
+                                    label="Poste Actuel"
+                                    type="post"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={user.post || []}
+                                    onChange={handleChange}
+                                    error={errors.post}
+                                    SelectProps={{
+                                        multiple: true,
+                                    }}
+                                />
+                            </Grid>
+
+                            {socialMediaInputs?.map((input, index) => (
+                                <>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            select
+                                            name="socialMedia"
+                                            label="Réseaux Sociaux"
+                                            variant="outlined"
+                                            fullWidth
+                                            value={input.socialMedia}
+                                            onChange={(e) => handleChanges(index, e)}
+                                        >
+                                            {[
+                                                "Facebook",
+                                                "Twitter",
+                                                "Snapchat",
+                                                "Tumblr",
+                                                "Linkedin",
+                                                "Viadeo",
+                                                "Instagram",
+                                                "Pinterest"
+                                            ]?.map((role, i) => (
+                                                <MenuItem key={role} value={role}>
+                                                    {role}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                        <TextField
+                                            name="link"
+                                            label="Lien du réseau social sélectionné"
+                                            variant="outlined"
+                                            fullWidth
+                                            value={input.link}
+                                            onChange={(e) => handleChanges(index, e)}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={2} style={{ display: "flex", alignItems: "center" }}>
+                                        {index === socialMediaInputs.length - 1 && (
+                                            <>
+                                                <Button variant="outlined" color="primary" onClick={handleAddInput}>
+                                                    +
+                                                </Button>
+                                                {socialMediaInputs.length > 1 && (
+                                                    <Button
+                                                        variant="outlined"
+                                                        color="error"
+                                                        onClick={() => handleRemoveInput(index)}
+                                                        style={{ marginLeft: "8px" }}
+                                                    >
+                                                        -
+                                                    </Button>
+                                                )}
+                                            </>
+                                        )}
+                                    </Grid>
+                                </>
+                            ))}
+                            <Grid item xs={12} sm={12}>
+                                <TinyMce onData={handleDescription} />
+                            </Grid>
+                        </>
+                        : null
+                }
                 <Grid item xs={12}>
                     <Button variant="outlined" color="primary" onClick={handleSubmit}>
                         Ajouter un utilisateur
@@ -338,5 +495,18 @@ const AddUser = () => {
         </MainCard>
     );
 };
-
+const buttonStyle = {
+    margin: '0 5px',
+    padding: '7px 18px',
+    fontSize: '12px',
+    borderRadius: '5px',
+    border: '2px solid #3f51b5',
+    color: '#3f51b5',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s, color 0.3s',
+    '&:hover': {
+        backgroundColor: '#3f51b5',
+        color: '#fff',
+    },
+};
 export default AddUser;

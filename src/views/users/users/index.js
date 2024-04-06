@@ -28,7 +28,6 @@ const SamplePage = () => {
     const [userToDeleteId, setUserToDeleteId] = useState(null);
     const [forbidden, setforbidden] = useState(false);
     const [usersPermission, setUsersPermission] = useState([]);
-    console.log(usersPermission)
     const handleDelete = (userId) => {
         setUserToDeleteId(userId);
         setDeleteDialogOpen(true);
@@ -178,101 +177,101 @@ const SamplePage = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-            {
-                forbidden ? "Vous n'êtes pas autorisé à continuer" :
-                    <>
+            {/* {
+                forbidden ? "Vous n'êtes pas autorisé à continuer" : */}
+            <>
 
-                        {usersPermission.includes('user_add') && <Grid container justifyContent="flex-end" item xs={12} onClick={() => history.push(`/ajouter-utilisateur`)}>
-                            <Button variant="outlined" color="primary">
-                                Ajouter Un Utilisateur
-                            </Button>
-                        </Grid>}
+                {usersPermission.includes('user_add') && <Grid container justifyContent="flex-end" item xs={12} onClick={() => history.push(`/ajouter-utilisateur`)}>
+                    <Button variant="outlined" color="primary">
+                        Ajouter Un Utilisateur
+                    </Button>
+                </Grid>}
 
-                        <TextField
-                            label="Recherche"
-                            variant="outlined"
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            fullWidth
-                            margin="normal"
-                        />
+                <TextField
+                    label="Recherche"
+                    variant="outlined"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    fullWidth
+                    margin="normal"
+                />
 
-                        {users?.length ?
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>ID</TableCell>
-                                            <TableCell>Nom</TableCell>
-                                            <TableCell>Téléphone</TableCell>
-                                            <TableCell>E-mail</TableCell>
-                                            {(usersPermission.includes('user_delete') || usersPermission.includes('user_update')) &&
-                                                <TableCell>Actions</TableCell>}
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {filteredUsers.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, i) => (
-                                            <TableRow key={row.id}>
-                                                <TableCell>{row.id}</TableCell>
-                                                <TableCell>{row.fullname}</TableCell>
-                                                <TableCell>{row.phone}</TableCell>
-                                                <TableCell>{row.email}</TableCell>
-                                                <TableCell>
+                {users?.length ?
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>ID</TableCell>
+                                    <TableCell>Nom</TableCell>
+                                    <TableCell>Téléphone</TableCell>
+                                    <TableCell>E-mail</TableCell>
+                                    {(usersPermission.includes('user_delete') || usersPermission.includes('user_update')) &&
+                                        <TableCell>Actions</TableCell>}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {filteredUsers.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row, i) => (
+                                    <TableRow key={row.id}>
+                                        <TableCell>{row.id}</TableCell>
+                                        <TableCell>{row.fullname}</TableCell>
+                                        <TableCell>{row.phone}</TableCell>
+                                        <TableCell>{row.email}</TableCell>
+                                        <TableCell>
 
-                                                    <>
-                                                        {usersPermission.includes('user_update') &&
-                                                            <IconButton style={{ color: "#2073c4" }} aria-label="edit" onClick={() => history.push(`/edit-utilisateur/${row.id}`)}>
-                                                                <EditIcon />
-                                                            </IconButton>}
-                                                        {usersPermission.includes('user_delete') &&
-                                                            <IconButton style={{ color: "#c42020" }} aria-label="delete" onClick={() => handleDelete(row.id)}>
-                                                                <DeleteIcon />
-                                                            </IconButton>}
-                                                    </>
+                                            <>
+                                                {usersPermission.includes('user_update') &&
+                                                    <IconButton style={{ color: "#2073c4" }} aria-label="edit" onClick={() => history.push(`/edit-utilisateur/${row.id}`)}>
+                                                        <EditIcon />
+                                                    </IconButton>}
+                                                {usersPermission.includes('user_delete') &&
+                                                    <IconButton style={{ color: "#c42020" }} aria-label="delete" onClick={() => handleDelete(row.id)}>
+                                                        <DeleteIcon />
+                                                    </IconButton>}
+                                            </>
 
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer> :
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer> :
 
-                            [0, 1, 2, 3, 4].map((e) => (
+                    [0, 1, 2, 3, 4].map((e) => (
 
-                                <Grid item xs={12} margin={2}>
-                                    <Grid container alignItems="center" justifyContent="space-between" spacing={gridSpacing}>
-                                        <Grid item xs zeroMinWidth>
-                                            <Grid container spacing={1}>
-                                                <Grid item xs={12}>
-                                                    <Skeleton variant="text" />
-                                                </Grid>
-                                                <Grid item xs={12}>
-                                                    <Skeleton variant="rect" height={20} />
-                                                </Grid>
-                                            </Grid>
+                        <Grid item xs={12} margin={2}>
+                            <Grid container alignItems="center" justifyContent="space-between" spacing={gridSpacing}>
+                                <Grid item xs zeroMinWidth>
+                                    <Grid container spacing={1}>
+                                        <Grid item xs={12}>
+                                            <Skeleton variant="text" />
                                         </Grid>
-                                        <Grid item>
-                                            <Skeleton variant="rect" height={50} width={80} />
+                                        <Grid item xs={12}>
+                                            <Skeleton variant="rect" height={20} />
                                         </Grid>
                                     </Grid>
                                 </Grid>
-                            ))}
+                                <Grid item>
+                                    <Skeleton variant="rect" height={50} width={80} />
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    ))}
 
 
-                        <div>
-                            <Button onClick={() => handleChangePage(null, page - 1)} disabled={page === 1}>Précédent</Button>
-                            <Button onClick={() => handleChangePage(null, page + 1)} disabled={page >= Math.ceil(filteredUsers.length / rowsPerPage)}>Suivant</Button>
-                            <span>Page {page} of {Math.ceil(filteredUsers.length / rowsPerPage)}</span>
-                            <select value={rowsPerPage} onChange={handleChangeRowsPerPage}>
-                                {[5, 10, 25].map((pageSize) => (
-                                    <option key={pageSize} value={pageSize}>
-                                        {pageSize}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </>
-            }
+                <div>
+                    <Button onClick={() => handleChangePage(null, page - 1)} disabled={page === 1}>Précédent</Button>
+                    <Button onClick={() => handleChangePage(null, page + 1)} disabled={page >= Math.ceil(filteredUsers.length / rowsPerPage)}>Suivant</Button>
+                    <span>Page {page} of {Math.ceil(filteredUsers.length / rowsPerPage)}</span>
+                    <select value={rowsPerPage} onChange={handleChangeRowsPerPage}>
+                        {[5, 10, 25].map((pageSize) => (
+                            <option key={pageSize} value={pageSize}>
+                                {pageSize}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </>
+            {/* } */}
         </MainCard>
     );
 };
